@@ -4,31 +4,130 @@
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js"></script>
 		<script type="text/javascript" src="http://gsgd.co.uk/sandbox/jquery/easing/jquery.easing.1.3.js"></script>
 		<script type="text/javascript" src="jquery.roto.1.0.js"></script>
+		<link rel="stylesheet" href="roto.css">
 	</head>
 	<body>
-		<div id="roto">
+		<h1>Roto demo</h1>
+		<h3>A simple, flexible width horizontal roto:</h3>
+		<div id="simple">
 			<ul>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
-				<li><img src="roto-test.jpg"/></li>
+				<li><img src="test-images/roto-test-01.jpg"/></li>
+				<li><img src="test-images/roto-test-02.jpg"/></li>
+				<li><img src="test-images/roto-test-03.jpg"/></li>
+				<li><img src="test-images/roto-test-04.jpg"/></li>
+				<li><img src="test-images/roto-test-05.jpg"/></li>
+				<li><img src="test-images/roto-test-06.jpg"/></li>
+				<li><img src="test-images/roto-test-07.jpg"/></li>
+				<li><img src="test-images/roto-test-08.jpg"/></li>
+				<li><img src="test-images/roto-test-09.jpg"/></li>
+				<li><img src="test-images/roto-test-10.jpg"/></li>
+				<li><img src="test-images/roto-test-11.jpg"/></li>
+				<li><img src="test-images/roto-test-12.jpg"/></li>
+				<li><img src="test-images/roto-test-13.jpg"/></li>
+				<li><img src="test-images/roto-test-14.jpg"/></li>
+				<li><img src="test-images/roto-test-15.jpg"/></li>
+				<li><img src="test-images/roto-test-16.jpg"/></li>
+			</ul>
+			<button class="prev">Previous</button>
+			<button class="next">Next</button>
+		</div>
+
+		<h3>A fixed width horizontal roto:</h3>
+		<div id="fixed">
+			<ul>
+				<li><img src="test-images/roto-test-01.jpg"/></li>
+				<li><img src="test-images/roto-test-02.jpg"/></li>
+				<li><img src="test-images/roto-test-03.jpg"/></li>
+				<li><img src="test-images/roto-test-04.jpg"/></li>
+				<li><img src="test-images/roto-test-05.jpg"/></li>
+				<li><img src="test-images/roto-test-06.jpg"/></li>
+				<li><img src="test-images/roto-test-07.jpg"/></li>
+				<li><img src="test-images/roto-test-08.jpg"/></li>
+				<li><img src="test-images/roto-test-09.jpg"/></li>
+				<li><img src="test-images/roto-test-10.jpg"/></li>
+				<li><img src="test-images/roto-test-11.jpg"/></li>
+				<li><img src="test-images/roto-test-12.jpg"/></li>
+				<li><img src="test-images/roto-test-13.jpg"/></li>
+				<li><img src="test-images/roto-test-14.jpg"/></li>
+				<li><img src="test-images/roto-test-15.jpg"/></li>
+				<li><img src="test-images/roto-test-16.jpg"/></li>
+			</ul>
+			<button class="prev">Previous</button>
+			<button class="next">Next</button>
+		</div>
+		
+		<h3>A vertical roto:</h3>
+		<div id="vertical-single">
+			<ul>
+				<li><img src="test-images/roto-test-01.jpg"/></li>
+				<li><img src="test-images/roto-test-02.jpg"/></li>
+				<li><img src="test-images/roto-test-03.jpg"/></li>
+				<li><img src="test-images/roto-test-04.jpg"/></li>
+				<li><img src="test-images/roto-test-05.jpg"/></li>
+				<li><img src="test-images/roto-test-06.jpg"/></li>
+				<li><img src="test-images/roto-test-07.jpg"/></li>
+				<li><img src="test-images/roto-test-08.jpg"/></li>
+				<li><img src="test-images/roto-test-09.jpg"/></li>
+				<li><img src="test-images/roto-test-10.jpg"/></li>
+				<li><img src="test-images/roto-test-11.jpg"/></li>
+				<li><img src="test-images/roto-test-12.jpg"/></li>
+				<li><img src="test-images/roto-test-13.jpg"/></li>
+				<li><img src="test-images/roto-test-14.jpg"/></li>
+				<li><img src="test-images/roto-test-15.jpg"/></li>
+				<li><img src="test-images/roto-test-16.jpg"/></li>
 			</ul>
 		</div>
+		<button id="vertical-single-prev">Previous</button>
+		<button id="vertical-single-next">Next</button>
+		
+		<h3>A vertical, multiple roto:</h3>
+		<div id="vertical-multi">
+			<ul>
+				<li><img src="test-images/roto-test-01.jpg"/></li>
+				<li><img src="test-images/roto-test-02.jpg"/></li>
+				<li><img src="test-images/roto-test-03.jpg"/></li>
+				<li><img src="test-images/roto-test-04.jpg"/></li>
+				<li><img src="test-images/roto-test-05.jpg"/></li>
+				<li><img src="test-images/roto-test-06.jpg"/></li>
+				<li><img src="test-images/roto-test-07.jpg"/></li>
+				<li><img src="test-images/roto-test-08.jpg"/></li>
+				<li><img src="test-images/roto-test-09.jpg"/></li>
+				<li><img src="test-images/roto-test-10.jpg"/></li>
+				<li><img src="test-images/roto-test-11.jpg"/></li>
+				<li><img src="test-images/roto-test-12.jpg"/></li>
+				<li><img src="test-images/roto-test-13.jpg"/></li>
+				<li><img src="test-images/roto-test-14.jpg"/></li>
+				<li><img src="test-images/roto-test-15.jpg"/></li>
+				<li><img src="test-images/roto-test-16.jpg"/></li>
+			</ul>
+		</div>
+		<button id="vertical-multi-prev">Previous</button>
+		<button id="vertical-multi-next">Next</button>
+		
+		<h3>A text roto:</h3>
+		<div id="text">
+			<ul>
+				<li>Roto text 1-</li>
+				<li>Roto text 2-</li>
+				<li>Roto text 3-</li>
+				<li>Roto text 4-</li>
+				<li>Roto text 5-</li>
+				<li>Roto text 6-</li>
+				<li>Roto text 7-</li>
+				<li>Roto text 8-</li>
+				<li>Roto text 9-</li>
+				<li>Roto text 10-</li>
+				<li>Roto text 11-</li>
+			</ul>
+		</div>
+		<button id="text-prev">Previous</button>
+		<button id="text-next">Next</button>
+
 	</body>
 	<script type="text/javascript">
-		$("#roto").roto();
+	$(window).load(function() {
+		$("#simple, #fixed, #text").roto();
+		$("#vertical-single, #vertical-multi").roto({ direction: "v" });
+	});
 	</script>
 </html>

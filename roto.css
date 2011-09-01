@@ -1,0 +1,30 @@
+
+#fixed {
+	width: 800px;
+}
+
+#vertical-single {
+	width: 150px;
+	height: 600px;
+}
+
+#vertical-multi {
+	width: 450px;
+	height: 450px;
+}
+
+#vertical-single ul li, #vertical-multi ul li {
+	width: 150px;
+	height: 150px;
+	text-align: center;
+	overflow: hidden;
+}
+
+#vertical-single ul li img, #vertical-multi ul li img {
+	display: inline;
+}
+
+#text {
+	width: 450px;
+	height: 25px;
+}
