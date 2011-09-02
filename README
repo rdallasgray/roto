@@ -72,6 +72,10 @@ You DON'T need to set these -- the script does it for you. Just don't contradict
 Otherwise, you shouldn't need to treat Roto with kid gloves. It'll take most of what you throw at it.
 
 
+What doesn't work?
+------------------
+In (surprise!) IE7 and 8, you have to use the buttons -- spinning the images with the pointer doesn't work. Watch this space, though.
+
 
 Acknowledgements
 ----------------

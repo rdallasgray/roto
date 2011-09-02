@@ -49,7 +49,7 @@
 			bounce_duration: 1800,
 			// length of timer interval -- pointer speed is only measured in last interval of movement
 			timer_interval: 50
-		}
+		};
 		options = $.extend(defaults, options || {});
 		
 		options.drift_easing = (typeof jQuery.easing[options.drift_easing] === "function") ?
