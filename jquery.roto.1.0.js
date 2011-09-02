@@ -89,6 +89,8 @@
 				container = this,
 				// the ul containing the elements to be rotoed, and a cache of its li subelements
 				ul = $(container).find("ul").first(), listElements = ul.find("li"),
+				// the starting offset of the ul (to prevent problems in IE7)
+				startOffset = 0,
 				// the maximum offset from starting position that the roto can be moved
 				maxOffset = 0,
 				// the minimum offset from starting position that the roto can be moved (to be calculated below)
@@ -116,7 +118,7 @@
 			// the minimum offset is the total measure of the listElements - the measure of the ul
 			var remeasure = function() {
 				containerMeasure = Math.ceil(ul.parent()[dimensions.measure.toLowerCase()]()),
-				minOffset = Math.ceil(rotoMeasure - containerMeasure) * -1;
+				minOffset = Math.ceil(rotoMeasure - containerMeasure + startOffset) * -1;
 			};
 
 			// enable or disable the previous and next buttons based on roto conditions
@@ -128,7 +130,7 @@
 				else nextButton.attr("disabled", "disabled");
 
 				// if the listElements are offset beyond the start of the ul, enable the previous button
-				if (currentOffset < maxOffset) {
+				if (currentOffset + startOffset < maxOffset) {
 					prevButton.removeAttr("disabled");
 				}
 				else prevButton.attr("disabled", "disabled");
@@ -190,8 +192,9 @@
 			var rotoTrack = function(pointerMove) {
 				var move = Math.ceil(pointerMove + currentOffset);
 					// allow user to pull the ul beyond the max/min offsets
-				if (move < (maxOffset + options.pull_amount) && move > (minOffset - options.pull_amount))
+				if (move < (maxOffset + options.pull_amount) && move > (minOffset - options.pull_amount)) {
 					ul.css(dimensions.offsetName, move);
+				}
 			};
 			
 			// timer to calculate speed of pointer movement
@@ -247,7 +250,7 @@
 						bounceBack(false);
 					}
 					else {
-						currentOffset = ul.position()[dimensions.offsetName];
+						currentOffset = ul.position()[dimensions.offsetName] - startOffset;
 					}
 					switchButtons();
 				});
@@ -259,7 +262,7 @@
 					opt = {};
 				opt[dimensions.offsetName] = end;
 				ul.animate(opt, options.bounce_duration, options.bounce_easing, function() {
-					currentOffset = end;
+					currentOffset = end - startOffset;
 					switchButtons();
 				});
 			};
@@ -304,7 +307,7 @@
 				e = wrapScrollEvent(e);
 				var startCoOrd = e["screen"+dimensions.coOrd];
 				ul.stop();
-				currentOffset = ul.position()[dimensions.offsetName];
+				currentOffset = ul.position()[dimensions.offsetName] - startOffset;
 
 				timer.setCurrentCoOrd(startCoOrd);
 
@@ -319,7 +322,7 @@
 				// user stopped scrolling
 				$(document).bind(scrollEvents.end + ".roto." + containerId, function() {
 					timer.stop();
-					currentOffset = ul.position()[dimensions.offsetName];
+					currentOffset = ul.position()[dimensions.offsetName] - startOffset;
 					if (currentOffset > maxOffset || currentOffset < minOffset) {
 						bounceBack(currentOffset < minOffset); 
 					}
@@ -388,6 +391,7 @@
 			}
 						
 			// check what state the buttons need to be in, and measure the listitems
+			startOffset = Math.ceil(ul.position()[dimensions.offsetName]);
 			remeasure();
 			switchButtons();
 		});
