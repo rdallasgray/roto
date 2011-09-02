@@ -244,7 +244,7 @@
 				opt[dimensions.offsetName] = move;
 				ul.animate(opt, options.drift_duration, options.drift_easing, function() {
 					if (ul.position()[dimensions.offsetName] > maxOffset) {
-						bounceBack();
+						bounceBack(false);
 					}
 					else {
 						currentOffset = ul.position()[dimensions.offsetName];
@@ -354,7 +354,7 @@
 			// set required styles
 			$(container).css({ overflow: "hidden", position: "relative" });
 			ul.css({ position: "relative", whiteSpace: "nowrap", padding: 0, margin: 0 });
-			listElements.css({ display: "block", float: "left", listStyle: "none" });
+			listElements.css({ display: "block", "float": "left", listStyle: "none" });
 
 			// measure the total width or height of the elements contained in the ul
 			// if roto is horizontal, we have to individually measure each listElement

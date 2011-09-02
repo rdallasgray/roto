@@ -1,6 +1,7 @@
 What is Roto?
 -------------
 Roto is a simple, flexible, touch-capable image spinner plugin for jQuery.
+See a demo at http://www.pausebuttonedit.com/roto/demo.html
 
 You may think another jQuery image spinner is the last thing the world needs. Well, none of the existing ones entirely met my reqirements -- so I wrote Roto.
 
