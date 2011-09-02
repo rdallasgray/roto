@@ -278,8 +278,11 @@
 
 				if (!isTouchDevice()) {
 					e.preventDefault(); // prevent drag behaviour
+					if (document.ondragstart !== undefined) {
+						ul.find("a, img").one("dragstart", function(f) { f.preventDefault(); });
+					}
 					if (linkElements.length > 0) {
-						$(window).one(scrollEvents.move + ".roto." + containerId, function(f) {
+						$(document).one(scrollEvents.move + ".roto." + containerId, function(f) {
 							// intially prevent link elements responding to clicks at start of ul tracking
 							linkElements.one("click.roto." + containerId, function(f) { f.preventDefault(); });
 							// gather any events attached to linkElements before unbinding
@@ -306,7 +309,7 @@
 				timer.setCurrentCoOrd(startCoOrd);
 
 				// scrolling has started, so begin tracking pointer movement and measuring speed
-				$(window).bind(scrollEvents.move + ".roto." + containerId, function(f) {
+				$(document).bind(scrollEvents.move + ".roto." + containerId, function(f) {
 					f.preventDefault();
 					f = wrapScrollEvent(f);
 					timer.setCurrentCoOrd(f["screen"+dimensions.coOrd]);
@@ -314,7 +317,7 @@
 				});
 				
 				// user stopped scrolling
-				$(window).bind(scrollEvents.end + ".roto." + containerId, function() {
+				$(document).bind(scrollEvents.end + ".roto." + containerId, function() {
 					timer.stop();
 					currentOffset = ul.position()[dimensions.offsetName];
 					if (currentOffset > maxOffset || currentOffset < minOffset) {
@@ -323,8 +326,8 @@
 					else {
 						drift();
 					}
-					$(window).unbind(scrollEvents.move + ".roto." + containerId);
-					$(window).unbind(scrollEvents.end + ".roto." + containerId);
+					$(document).unbind(scrollEvents.move + ".roto." + containerId);
+					$(document).unbind(scrollEvents.end + ".roto." + containerId);
 					if (!isTouchDevice() && linkElements.length > 0) {
 						window.setTimeout(function() {
 							// reattach old events to linkElements after a short delay
@@ -384,7 +387,7 @@
 				return;
 			}
 						
-			// begin by checking what state the buttons need to be in
+			// check what state the buttons need to be in, and measure the listitems
 			remeasure();
 			switchButtons();
 		});
