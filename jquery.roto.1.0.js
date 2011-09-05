@@ -57,7 +57,8 @@
 		
 		options.bounce_easing = (typeof jQuery.easing[options.bounce_easing] === "function") ?
 			options.bounce_easing : "linear";
-					
+
+		var isTouchDevice = false;
 	    try {
 	        document.createEvent("TouchEvent");
 	        isTouchDevice = true;
@@ -67,7 +68,10 @@
 
 		var wrapScrollEvent = function(e) {
 			if (isTouchDevice) {
-				return e.originalEvent.touches[0];
+				if (typeof e.originalEvent.touches !== "undefined") {
+					return e.originalEvent.touches[0];
+				}
+				return e;
 			}
 			return e;
 		};
@@ -104,9 +108,7 @@
 				// whether animations are running
 				running = false,
 				// cache of the previous and next button elements
-				prevButton = $(container).find(options.btnPrev), nextButton = $(container).find(options.btnNext),
-				// is the target device touch-capable?
-				isTouchDevice;
+				prevButton = $(container).find(options.btnPrev), nextButton = $(container).find(options.btnNext);
 	
 			// if prev/next buttons don't seem to be inside the container, look for them outside
 			if (prevButton.length === 0 && options.btnPrev === defaults.btnPrev) {
@@ -309,7 +311,6 @@
 				var startCoOrd = e["screen"+dimensions.coOrd];
 				ul.stop();
 				currentOffset = ul.position()[dimensions.offsetName] - startOffset;
-
 				timer.setCurrentCoOrd(startCoOrd);
 
 				// scrolling has started, so begin tracking pointer movement and measuring speed
