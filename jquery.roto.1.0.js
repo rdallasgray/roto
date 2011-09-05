@@ -37,12 +37,12 @@
 			direction: "h",
 			speed: 200,
 			shift_easing: null,
-			drift_easing: "easeOutCubic",
+			rotoDrift_easing: "easeOutCubic",
 			bounce_easing: "easeOutElastic",
 			// multiplier for inertial movement
-			drift_factor: 500,
+			rotoDrift_factor: 500,
 			// ms length of inertial movement
-			drift_duration: 1750,
+			rotoDrift_duration: 1750,
 			// distance user can pull the ul beyond max/min offsets
 			pull_amount: 200,
 			// ms length of bounce back after pulling
@@ -52,23 +52,21 @@
 		};
 		options = $.extend(defaults, options || {});
 		
-		options.drift_easing = (typeof jQuery.easing[options.drift_easing] === "function") ?
-			options.drift_easing : "linear";
+		options.rotoDrift_easing = (typeof jQuery.easing[options.rotoDrift_easing] === "function") ?
+			options.rotoDrift_easing : "linear";
 		
 		options.bounce_easing = (typeof jQuery.easing[options.bounce_easing] === "function") ?
 			options.bounce_easing : "linear";
-		
-		// allow for touch devices
-		var isTouchDevice = function() {
-		    try {
-		        document.createEvent("TouchEvent");
-		        return true;
-		    } catch (e) {
-		        return false;
-		    }
-		};
+					
+	    try {
+	        document.createEvent("TouchEvent");
+	        isTouchDevice = true;
+	    } catch (e) {
+	        isTouchDevice = false;
+	    }
+
 		var wrapScrollEvent = function(e) {
-			if (isTouchDevice()) {
+			if (isTouchDevice) {
 				return e.originalEvent.touches[0];
 			}
 			return e;
@@ -82,7 +80,7 @@
 				// names of dimensions are dependent on whether the roto is horizontal or vertical
 				dimensions = orientations[options.direction],
 				// names of events are dependent on whether device uses touch events
-				scrollEvents = isTouchDevice() ?
+				scrollEvents = isTouchDevice ?
 					{ start: "touchstart", move: "touchmove", end: "touchend" } :
 					{ start: "mousedown", move: "mousemove", end: "mouseup" },
 				// the element containing the buttons and ul
@@ -106,13 +104,17 @@
 				// whether animations are running
 				running = false,
 				// cache of the previous and next button elements
-				prevButton = $(container).find(options.btnPrev), nextButton = $(container).find(options.btnNext);
-				if (prevButton.length === 0 && options.btnPrev === defaults.btnPrev) {
-					if ($(container).attr("id")) {
-						prevButton = $("#"+$(container).attr("id")+"-prev");
-						nextButton = $("#"+$(container).attr("id")+"-next");
-					}
+				prevButton = $(container).find(options.btnPrev), nextButton = $(container).find(options.btnNext),
+				// is the target device touch-capable?
+				isTouchDevice;
+	
+			// if prev/next buttons don't seem to be inside the container, look for them outside
+			if (prevButton.length === 0 && options.btnPrev === defaults.btnPrev) {
+				if ($(container).attr("id")) {
+					prevButton = $("#"+$(container).attr("id")+"-prev");
+					nextButton = $("#"+$(container).attr("id")+"-next");
 				}
+			}
 
 			// remeasure the container and derive the minimum offset allowed
 			// the minimum offset is the total measure of the listElements - the measure of the ul
@@ -232,20 +234,19 @@
 			}();
 			
 			// continue ul movement inertially based on pointer speed
-			var drift = function() {
+			var rotoDrift = function() {
 				var speed_dir = timer.getPointerSpeed(),
 					speed = speed_dir[0], dir = speed_dir[1];
 				if (speed === 0) return;
 				
-				// distance to drift
-				var distance = speed * options.drift_factor * dir,
+				// distance to rotoDrift
+				var distance = speed * options.rotoDrift_factor * dir,
 					move = distance + currentOffset;
-
 				if (move > maxOffset) move = maxOffset;
 				if (move < minOffset) move = minOffset;
 				var opt = {};
 				opt[dimensions.offsetName] = move;
-				ul.animate(opt, options.drift_duration, options.drift_easing, function() {
+				ul.animate(opt, options.rotoDrift_duration, options.rotoDrift_easing, function() {
 					if (ul.position()[dimensions.offsetName] > maxOffset) {
 						bounceBack(false);
 					}
@@ -279,7 +280,7 @@
 				var linkElements = ul.find("a"),
 					oldLinkEvents = {};
 
-				if (!isTouchDevice()) {
+				if (!isTouchDevice) {
 					e.preventDefault(); // prevent drag behaviour
 					if (document.ondragstart !== undefined) {
 						ul.find("a, img").one("dragstart", function(f) { f.preventDefault(); });
@@ -327,11 +328,11 @@
 						bounceBack(currentOffset < minOffset); 
 					}
 					else {
-						drift();
+						rotoDrift();
 					}
 					$(document).unbind(scrollEvents.move + ".roto." + containerId);
 					$(document).unbind(scrollEvents.end + ".roto." + containerId);
-					if (!isTouchDevice() && linkElements.length > 0) {
+					if (!isTouchDevice && linkElements.length > 0) {
 						window.setTimeout(function() {
 							// reattach old events to linkElements after a short delay
 							linkElements.unbind("click.roto." + containerId);
@@ -361,6 +362,7 @@
 			$(container).css({ overflow: "hidden", position: "relative" });
 			ul.css({ position: "relative", whiteSpace: "nowrap", padding: 0, margin: 0 });
 			listElements.css({ display: "block", "float": "left", listStyle: "none" });
+			listElements.find("img").css("-webkit-transform", "translate3d(0px,0px,0px)");
 
 			// measure the total width or height of the elements contained in the ul
 			// if roto is horizontal, we have to individually measure each listElement
@@ -389,7 +391,7 @@
 				}
 				return;
 			}
-						
+	
 			// check what state the buttons need to be in, and measure the listitems
 			startOffset = Math.ceil(ul.position()[dimensions.offsetName]);
 			remeasure();
