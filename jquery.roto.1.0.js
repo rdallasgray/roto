@@ -35,25 +35,21 @@
 			btnPrev: ".prev",
 			btnNext: ".next",
 			direction: "h",
-			speed: 200,
+			shift_duration: 200,
 			shift_easing: null,
-			rotoDrift_easing: "easeOutCubic",
-			bounce_easing: "easeOutElastic",
-			// multiplier for inertial movement
-			rotoDrift_factor: 500,
-			// ms length of inertial movement
-			rotoDrift_duration: 1750,
-			// distance user can pull the ul beyond max/min offsets
-			pull_amount: 200,
-			// ms length of bounce back after pulling
-			bounce_duration: 1800,
-			// length of timer interval -- pointer speed is only measured in last interval of movement
-			timer_interval: 50
+			drift_duration: 1800,
+			drift_factor: 500,
+			drift_easing: "easeOutCubic",
+			bounce_duration: 350,
+			bounce_easing: "easeOutCubic",
+			pull_divisor: 4,
+			timer_interval: 50,
+			msToS: 1000
 		};
 		options = $.extend(defaults, options || {});
 		
-		options.rotoDrift_easing = (typeof jQuery.easing[options.rotoDrift_easing] === "function") ?
-			options.rotoDrift_easing : "linear";
+		options.drift_easing = (typeof jQuery.easing[options.drift_easing] === "function") ?
+			options.drift_easing : "linear";
 		
 		options.bounce_easing = (typeof jQuery.easing[options.bounce_easing] === "function") ?
 			options.bounce_easing : "linear";
@@ -65,7 +61,8 @@
 	    } catch (e) {
 	        isTouchDevice = false;
 	    }
-
+		
+		// get the correct scroll events for touch and desktop devices
 		var wrapScrollEvent = function(e) {
 			if (isTouchDevice) {
 				if (typeof e.originalEvent.touches !== "undefined") {
@@ -74,6 +71,49 @@
 				return e;
 			}
 			return e;
+		};
+		
+		// get correct transition css properties and events, if supported
+		var transformProp = null, transitionProp = null, transitionEvent = null;
+		(function() {
+			var body = document.body || document.documentElement,
+				transform = {
+					transform: "transform", 
+					MozTransform: "-moz-transform", 
+					WebkitTransform: "-webkit-transform"
+				},
+				transition = {
+					transition: { prop: "transition", "event": "transitionend" },
+					MozTransition: { prop: "-moz-transition", "event": "transitionend" },
+					WebkitTransition: { prop: "-webkit-transition", "event": "webkitTransitionEnd" }
+				};
+			for (var i in transform) {
+				if (typeof body.style[i] !== "undefined") {
+					transformProp = transform[i];
+					break;
+				}
+			}
+			for (var i in transition) {
+				if (typeof body.style[i] !== "undefined") {
+					transitionProp = transition[i].prop, transitionEvent = transition[i].event;
+					break;
+				}
+			}
+		})();
+		
+		// support both jQuery.animate and css transitions
+		var doAnimation = function(element, css, duration, easing, callback) {
+			if (transitionProp !== null) {
+				var opt = {};
+				opt[transitionProp + "-duration"] = duration/options.msToS + "s";
+				opt[transitionProp + "-timing-function"] = "cubic-bezier(0,0,0.4,1)";
+				element.css(opt);
+				element.one(transitionEvent, callback);
+				element.css(css);
+			}
+			else {
+				element.animate(css, duration, easing, callback);
+			}
 		};
 
 		return this.each(function() {
@@ -88,9 +128,9 @@
 					{ start: "touchstart", move: "touchmove", end: "touchend" } :
 					{ start: "mousedown", move: "mousemove", end: "mouseup" },
 				// the element containing the buttons and ul
-				container = this,
+				container = $(this),
 				// the ul containing the elements to be rotoed, and a cache of its li subelements
-				ul = $(container).find("ul").first(), listElements = ul.find("li"),
+				ul = container.find("ul").first(), listElements = ul.find("li"),
 				// the starting offset of the ul (to prevent problems in IE7)
 				startOffset = 0,
 				// the maximum offset from starting position that the roto can be moved
@@ -104,17 +144,51 @@
 				// the total width or height of the contents of the ul element
 				rotoMeasure = 0,
 				// unique identification of the overall container, to be used in namespacing events
-				containerId = (typeof $(container).attr("id") !== undefined) ? $(container).attr("id") : new Date().getTime() + "",
+				containerId = (typeof container.attr("id") !== undefined) ? container.attr("id") : new Date().getTime() + "",
 				// whether animations are running
 				running = false,
 				// cache of the previous and next button elements
-				prevButton = $(container).find(options.btnPrev), nextButton = $(container).find(options.btnNext);
-	
+				prevButton = container.find(options.btnPrev), nextButton = container.find(options.btnNext);
+					
+			// set required styles
+			container.css({ overflow: "hidden", position: "relative" });
+			ul.css({ position: "relative", whiteSpace: "nowrap", padding: 0, margin: 0 });
+			listElements.css({ display: "block", "float": "left", listStyle: "none" });
+			
+			// set up transitions
+			var setTransitions = function() {
+					if (transitionProp !== null) {
+						var opt = {},
+							prop = transformProp !== null ? transformProp : dimensions.offsetName;
+						opt[transitionProp] = prop + " " + options.shift_duration/options.msToS + "s ease 0s";
+						ul.css(opt);
+					}
+				},
+				unsetTransitions = function() {
+					if (transitionProp !== null) {
+						var opt = {};
+						opt[transitionProp] = "none";
+						ul.css(opt);
+					}
+				},
+				stopAnimation = function(element) {
+					if (transitionProp !== null) {
+						var offset = getCurrentOffset();
+						unsetTransitions();
+						ul.css(getAnimatedProp(offset));
+					}
+					else {
+						element.stop();
+					}
+				};
+			setTransitions();
+			if (transitionProp === "-webkit-transition") ul.css("-webkit-backface-visibility", "hidden");
+
 			// if prev/next buttons don't seem to be inside the container, look for them outside
 			if (prevButton.length === 0 && options.btnPrev === defaults.btnPrev) {
-				if ($(container).attr("id")) {
-					prevButton = $("#"+$(container).attr("id")+"-prev");
-					nextButton = $("#"+$(container).attr("id")+"-next");
+				if (container.attr("id")) {
+					prevButton = $("#"+container.attr("id")+"-prev");
+					nextButton = $("#"+container.attr("id")+"-next");
 				}
 			}
 
@@ -123,6 +197,35 @@
 			var remeasure = function() {
 				containerMeasure = Math.ceil(ul.parent()[dimensions.measure.toLowerCase()]()),
 				minOffset = Math.ceil(rotoMeasure - containerMeasure + startOffset) * -1;
+			};
+		
+			// get the css property to animate based on whether transforms are supported
+			var getAnimatedProp = function(move) {
+				var opt = {};
+				if (transformProp !== null) {
+					var use3d = isTouchDevice ? "3d" : "",
+						translateStr = (use3d === "3d") ? "(Xpx,Ypx,0px)" : "(Xpx,Ypx)",
+						oppositeCoOrd = { X: "Y", Y: "X"};
+					opt[transformProp] = "translate" + use3d + 
+						translateStr.replace(dimensions.coOrd, move).replace(oppositeCoOrd[dimensions.coOrd], "0");
+				}
+				else {
+					opt[dimensions.offsetName] = move+"px";
+				}
+				return opt;
+			};
+			
+			// get the current offset position of the ul, dependent on whether transforms are supported
+			var getCurrentOffset = function() {
+				var cssPosition = ul.position()[dimensions.offsetName] - startOffset;
+				if (transformProp === null) return cssPosition;
+				var transformStr = ul.css(transformProp),
+					matches = transformStr.match(/\-?[0-9]+/g);
+				
+				if (matches === null) return cssPosition;
+				
+				var val = dimensions.coOrd === 'X' ? matches[4] : matches[5];
+				return parseInt(val);
 			};
 
 			// enable or disable the previous and next buttons based on roto conditions
@@ -145,12 +248,11 @@
 				// do nothing if the animation is already running
 				if (running) return;
 				running = true;
-				
+				setTransitions();
+
 				// internal function to move the listElements by the calculated amount
 				var doShift = function(move) {
-					var opt = {};
-					opt[dimensions.offsetName] = move;
-					ul.animate(opt, options.speed, options.shift_easing, function() {
+					doAnimation(ul, getAnimatedProp(move), options.shift_duration, options.shift_easing, function() {
 						currentOffset = move;
 						switchButtons();
 						running = false;
@@ -174,7 +276,6 @@
 					return li;
 				};
 
-				// 
 				switch(dir) {
 					case 'prev':
 					// if we're moving backwards, find the element one container width towards the start of the container
@@ -195,12 +296,41 @@
 			// track the ul to movement of the pointer
 			var rotoTrack = function(pointerMove) {
 				var move = Math.ceil(pointerMove + currentOffset);
-					// allow user to pull the ul beyond the max/min offsets
-				if (move < (maxOffset + options.pull_amount) && move > (minOffset - options.pull_amount)) {
-					ul.css(dimensions.offsetName, move);
+				// allow user to pull the ul beyond the max/min offsets
+				if (move < (maxOffset + containerMeasure/options.pull_divisor) && move > (minOffset - containerMeasure/options.pull_divisor)) {
+					ul.css(getAnimatedProp(move));
 				}
 			};
 			
+			// continue ul movement inertially based on pointer speed
+			var rotoDrift = function() {
+				var speed_dir = timer.getPointerSpeed(),
+					speed = speed_dir[0], dir = speed_dir[1];
+				if (speed === 0) return;
+				
+				// distance to rotoDrift
+				var distance = speed * options.drift_factor * dir,
+					move = distance + currentOffset;
+				if (move > maxOffset) move = maxOffset;
+				if (move < minOffset) move = minOffset;
+				doAnimation(ul, getAnimatedProp(move), options.drift_duration, options.drift_easing, function() {
+					currentOffset = getCurrentOffset() - startOffset;
+					if (currentOffset > maxOffset) {
+						bounceBack(false);
+					}
+					switchButtons();
+				});
+			};
+			
+			// bounce the ul elastically after it's pulled beyond max or min offsets
+			var bounceBack = function(dir) {
+				var end = dir ? minOffset : maxOffset;
+				doAnimation(ul, getAnimatedProp(end), options.bounce_duration, options.bounce_easing, function() {
+					currentOffset = end - startOffset;
+					switchButtons();
+				});
+			};
+						
 			// timer to calculate speed of pointer movement
 			var timer = function() {
 				var startCoOrd = 0,
@@ -220,7 +350,7 @@
 					},
 					stop: function() {
 						clearInterval(chunker);
-						endCoOrd = currentCoOrd;
+						chunk.endCoOrd = currentCoOrd;
 					},
 					getPointerSpeed: function() {
 						var translation = chunk.endCoOrd - chunk.startCoOrd,
@@ -234,42 +364,7 @@
 					}
 				}
 			}();
-			
-			// continue ul movement inertially based on pointer speed
-			var rotoDrift = function() {
-				var speed_dir = timer.getPointerSpeed(),
-					speed = speed_dir[0], dir = speed_dir[1];
-				if (speed === 0) return;
-				
-				// distance to rotoDrift
-				var distance = speed * options.rotoDrift_factor * dir,
-					move = distance + currentOffset;
-				if (move > maxOffset) move = maxOffset;
-				if (move < minOffset) move = minOffset;
-				var opt = {};
-				opt[dimensions.offsetName] = move;
-				ul.animate(opt, options.rotoDrift_duration, options.rotoDrift_easing, function() {
-					if (ul.position()[dimensions.offsetName] > maxOffset) {
-						bounceBack(false);
-					}
-					else {
-						currentOffset = ul.position()[dimensions.offsetName] - startOffset;
-					}
-					switchButtons();
-				});
-			};
-			
-			// bounce the ul elastically after it's pulled beyond max or min offsets
-			var bounceBack = function(dir) {
-				var end = dir ? minOffset : maxOffset,
-					opt = {};
-				opt[dimensions.offsetName] = end;
-				ul.animate(opt, options.bounce_duration, options.bounce_easing, function() {
-					currentOffset = end - startOffset;
-					switchButtons();
-				});
-			};
-			
+
 			$(window).resize(function() {
 				containerMeasure = ul.parent()[dimensions.measure.toLowerCase()](),
 				remeasure();
@@ -278,6 +373,7 @@
 
 			// bind scroll events
 			ul.bind(scrollEvents.start + ".roto." + containerId, function(e) {
+				stopAnimation(ul);
 				switchButtons();
 				var linkElements = ul.find("a"),
 					oldLinkEvents = {};
@@ -309,8 +405,7 @@
 				}
 				e = wrapScrollEvent(e);
 				var startCoOrd = e["screen"+dimensions.coOrd];
-				ul.stop();
-				currentOffset = ul.position()[dimensions.offsetName] - startOffset;
+				currentOffset = getCurrentOffset() - startOffset;
 				timer.setCurrentCoOrd(startCoOrd);
 
 				// scrolling has started, so begin tracking pointer movement and measuring speed
@@ -322,9 +417,10 @@
 				});
 				
 				// user stopped scrolling
-				$(document).bind(scrollEvents.end + ".roto." + containerId, function() {
+				$(document).one(scrollEvents.end, function() {
 					timer.stop();
-					currentOffset = ul.position()[dimensions.offsetName] - startOffset;
+					setTransitions();
+					currentOffset = getCurrentOffset();
 					if (currentOffset > maxOffset || currentOffset < minOffset) {
 						bounceBack(currentOffset < minOffset); 
 					}
@@ -332,7 +428,6 @@
 						rotoDrift();
 					}
 					$(document).unbind(scrollEvents.move + ".roto." + containerId);
-					$(document).unbind(scrollEvents.end + ".roto." + containerId);
 					if (!isTouchDevice && linkElements.length > 0) {
 						window.setTimeout(function() {
 							// reattach old events to linkElements after a short delay
@@ -358,12 +453,6 @@
 					return rotoShift("next");
 				});
 			}
-				
-			// set required styles
-			$(container).css({ overflow: "hidden", position: "relative" });
-			ul.css({ position: "relative", whiteSpace: "nowrap", padding: 0, margin: 0 });
-			listElements.css({ display: "block", "float": "left", listStyle: "none" });
-			listElements.find("img").css("-webkit-transform", "translate3d(0px,0px,0px)");
 
 			// measure the total width or height of the elements contained in the ul
 			// if roto is horizontal, we have to individually measure each listElement
@@ -394,7 +483,7 @@
 			}
 	
 			// check what state the buttons need to be in, and measure the listitems
-			startOffset = Math.ceil(ul.position()[dimensions.offsetName]);
+			startOffset = Math.ceil(getCurrentOffset());
 			remeasure();
 			switchButtons();
 		});

@@ -32,11 +32,11 @@ See the demo for an example.
 
 Are there dependencies?
 -----------------------
-Roto works much better if you include George McGinley Smith's jQuery Easing plugin: http://gsgd.co.uk/sandbox/jquery/easing/
+If your target browser doesn't support CSS transitions, Roto works much better if you include George McGinley Smith's jQuery Easing plugin: http://gsgd.co.uk/sandbox/jquery/easing/
 
 It'll work without it, but the deceleration and bouncing is a bit ugly.
 
-Using the Easing plugin also gives you access to alternative easing algorithms, if you want to be different. You can specify these via the options.
+Using the Easing plugin also gives you access to alternative easing algorithms, if you want to be different. You can specify these via the options, although NB at present, easing options for CSS transitions are hardwired.
 
 
 
