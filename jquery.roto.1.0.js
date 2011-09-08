@@ -41,10 +41,10 @@
 			drift_duration: 1800,
 			drift_factor: 500,
 			drift_easing: "easeOutCubic",
-			drift_bezier: [0,0,0.3,1],
+			drift_bezier: [0,0.5,0.5,1],
 			bounce_duration: 350,
 			bounce_easing: "easeOutCubic",
-			bounce_bezier: [0.3,0.3,0,1],
+			bounce_bezier: [0,0,0.6,1],
 			pull_divisor: 3,
 			timer_interval: 50,
 			msToS: 1000,
@@ -113,7 +113,7 @@
 			else {
 				var easingString = options[easing + "_easing"],
 					ease = typeof jQuery.easing[easingString] === "function" ? 
-					easingString : $.bez.apply(null, options[easing + "_bezier"]);
+					easingString : $.bez(options[easing + "_bezier"]);
 				element.animate(css, duration, ease, callback);
 			}
 		};

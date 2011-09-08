@@ -32,6 +32,7 @@ See the demo for an example.
 
 Are there dependencies?
 -----------------------
+The only dependency is my own Bez plugin 
 If your target browser doesn't support CSS transitions, Roto works much better if you include George McGinley Smith's jQuery Easing plugin: http://gsgd.co.uk/sandbox/jquery/easing/
 
 It'll work without it, but the deceleration and bouncing is a bit ugly.
@@ -81,8 +82,3 @@ It might not work in IE6. I haven't tested it. Life's too short.
 Acknowledgements
 ----------------
 I must acknowledge Ganeshji Marwaha's jCarouselLite (http://www.gmarwaha.com/jquery/jcarousellite), which I used somewhat before writing Roto. Some of the option names are lifted from jCarouselLite, because there was no point being awkward by changing them.
-
-
-Questions, plaudits, money
---------------------------
-Send them to mail@robertdallasgray.com.
