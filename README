@@ -17,7 +17,6 @@ What are these stringent and esoteric requirements?
 4. I wanted it to be supplied with a minimum of styling. I'm a designer, so I'll do the styling, thanks. I don't need any funny-looking skins -- just the functionality.
 
 
-
 How do I use it?
 ----------------
 1. Create a div or other block-level element. Give it an id or a classname that you can use to identify it.
@@ -29,22 +28,14 @@ How do I use it?
 See the demo for an example.
 
 
-
 Are there dependencies?
 -----------------------
-The only dependency is my own Bez plugin 
-If your target browser doesn't support CSS transitions, Roto works much better if you include George McGinley Smith's jQuery Easing plugin: http://gsgd.co.uk/sandbox/jquery/easing/
-
-It'll work without it, but the deceleration and bouncing is a bit ugly.
-
-Using the Easing plugin also gives you access to alternative easing algorithms, if you want to be different. You can specify these via the options, although NB at present, easing options for CSS transitions are hardwired.
-
+The only dependency is my own Bez plugin (https://github.com/rdallasgray/bez), which is used to create jQuery-compatible easing functions from cubic-bezier co-ordinates. That's just for compatibility with browsers which don't support CSS transitions, so if you're only supporting newer browsers, you don't need it.
 
 
 What else do I need to know?
 ----------------------------
-Roto works best if you call it using $(window).load() rather than $(document).ready(). This is because WebKit-based browsers don't know the dimensions of images at $(document).ready() time, and Roto relies on those dimensions. Of course, if you're giving all your images explicit dimensions anyway, you can use $(document).ready().
-
+Roto works best if you call it using $(window).load() rather than $(document).ready(). This is because Webkit-based browsers don't know the dimensions of images at $(document).ready() time, and Roto relies on those dimensions. Of course, if you're giving all your images explicit dimensions anyway, you can use $(document).ready().
 
 
 What options do I have, and what are the defaults?
@@ -70,7 +61,8 @@ There are certain things that will break Roto, though:
 2. The unordered list must be set with position: relative, white-space: nowrap, and padding and margin 0.
 3. The listitems must be set with display: block, float: left, list-style: none.
 
-You DON'T need to set these -- the script does it for you. Just don't contradict them in your own stylesheets.
+You DON'T need to set these -- the script does it for you. But be aware that if you contradict them in your own stylesheets or scripts, you could run into problems.
+
 Otherwise, you shouldn't need to treat Roto with kid gloves. It'll take most of what you throw at it.
 
 
