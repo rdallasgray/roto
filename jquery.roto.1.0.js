@@ -36,23 +36,21 @@
 			btnNext: ".next",
 			direction: "h",
 			shift_duration: 200,
+			shift_bezier: [0,0,0,1],
 			shift_easing: null,
 			drift_duration: 1800,
 			drift_factor: 500,
 			drift_easing: "easeOutCubic",
+			drift_bezier: [0,0,0.3,1],
 			bounce_duration: 350,
 			bounce_easing: "easeOutCubic",
-			pull_divisor: 4,
+			bounce_bezier: [0.3,0.3,0,1],
+			pull_divisor: 3,
 			timer_interval: 50,
-			msToS: 1000
+			msToS: 1000,
+			disable_transitions: false
 		};
 		options = $.extend(defaults, options || {});
-		
-		options.drift_easing = (typeof jQuery.easing[options.drift_easing] === "function") ?
-			options.drift_easing : "linear";
-		
-		options.bounce_easing = (typeof jQuery.easing[options.bounce_easing] === "function") ?
-			options.bounce_easing : "linear";
 
 		var isTouchDevice = false;
 	    try {
@@ -76,6 +74,7 @@
 		// get correct transition css properties and events, if supported
 		var transformProp = null, transitionProp = null, transitionEvent = null;
 		(function() {
+			if (options.disable_transitions) return;
 			var body = document.body || document.documentElement,
 				transform = {
 					transform: "transform", 
@@ -106,13 +105,16 @@
 			if (transitionProp !== null) {
 				var opt = {};
 				opt[transitionProp + "-duration"] = duration/options.msToS + "s";
-				opt[transitionProp + "-timing-function"] = "cubic-bezier(0,0,0.4,1)";
+				opt[transitionProp + "-timing-function"] = ["cubic-bezier(", options[easing + "_bezier"].join(","), ")"].join("");
 				element.css(opt);
 				element.one(transitionEvent, callback);
 				element.css(css);
 			}
 			else {
-				element.animate(css, duration, easing, callback);
+				var easingString = options[easing + "_easing"],
+					ease = typeof jQuery.easing[easingString] === "function" ? 
+					easingString : $.bez.apply(null, options[easing + "_bezier"]);
+				element.animate(css, duration, ease, callback);
 			}
 		};
 
@@ -252,7 +254,7 @@
 
 				// internal function to move the listElements by the calculated amount
 				var doShift = function(move) {
-					doAnimation(ul, getAnimatedProp(move), options.shift_duration, options.shift_easing, function() {
+					doAnimation(ul, getAnimatedProp(move), options.shift_duration, "shift", function() {
 						currentOffset = move;
 						switchButtons();
 						running = false;
@@ -313,7 +315,7 @@
 					move = distance + currentOffset;
 				if (move > maxOffset) move = maxOffset;
 				if (move < minOffset) move = minOffset;
-				doAnimation(ul, getAnimatedProp(move), options.drift_duration, options.drift_easing, function() {
+				doAnimation(ul, getAnimatedProp(move), options.drift_duration, "drift", function() {
 					currentOffset = getCurrentOffset() - startOffset;
 					if (currentOffset > maxOffset) {
 						bounceBack(false);
@@ -325,7 +327,7 @@
 			// bounce the ul elastically after it's pulled beyond max or min offsets
 			var bounceBack = function(dir) {
 				var end = dir ? minOffset : maxOffset;
-				doAnimation(ul, getAnimatedProp(end), options.bounce_duration, options.bounce_easing, function() {
+				doAnimation(ul, getAnimatedProp(end), options.bounce_duration, "bounce", function() {
 					currentOffset = end - startOffset;
 					switchButtons();
 				});

@@ -2,8 +2,8 @@
 <html lang="en">
 	<head>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
-		<script type="text/javascript" src="http://gsgd.co.uk/sandbox/jquery/easing/jquery.easing.1.3.js"></script>
 		<script type="text/javascript" src="jquery.roto.1.0.js"></script>
+		<script type="text/javascript" src="jquery.bez.1.0.js"></script>
 		<link rel="stylesheet" href="roto.css">
 	</head>
 	<body>
@@ -126,7 +126,8 @@
 	</body>
 	<script type="text/javascript">
 	$(window).load(function() {
-		$("#simple, #fixed, #text").roto();
+		$("#simple").roto({ disable_transitions: true });
+		$("#fixed, #text").roto();
 		$("#vertical-single, #vertical-multi").roto({ direction: "v" });
 	});
 	</script>
