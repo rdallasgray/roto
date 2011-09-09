@@ -39,9 +39,9 @@
 			shift_bezier: [0,0,0,1],
 			drift_duration: 1800,
 			drift_factor: 500,
-			drift_bezier: [0,0.5,0.5,1],
+			drift_bezier: [0,0,0.6,1],
 			bounce_duration: 350,
-			bounce_bezier: [0,0,0.6,1],
+			bounce_bezier: [0,0.5,0.5,1],
 			pull_divisor: 3,
 			timer_interval: 50,
 			msToS: 1000,
@@ -100,7 +100,7 @@
 		// support both jQuery.animate and css transitions
 		var doAnimation = function(element, css, duration, easing, callback) {
 			if (transitionProp !== null) {
-				var opt = {}, id = "rotoAnim" + new Date().getTime();
+				var opt = {};
 				opt[transitionProp + "-duration"] = duration/options.msToS + "s";
 				opt[transitionProp + "-timing-function"] = ["cubic-bezier(", options[easing + "_bezier"].join(","), ")"].join("");
 				element.css(opt);
@@ -147,6 +147,8 @@
 				containerId = (typeof container.attr("id") !== undefined) ? container.attr("id") : new Date().getTime() + "",
 				// if transforms are supported, the string giving the css property to be animated
 				animatedProp = null,
+				// basic setting for the css transition property
+				transitionStr = null,
 				// whether animations are running
 				running = false,
 				// cache of the previous and next button elements
@@ -160,9 +162,11 @@
 			// set up transitions
 			var setTransitions = function() {
 					if (transitionProp !== null) {
-						var opt = {},
-							prop = transformProp !== null ? transformProp : dimensions.offsetName;
-						opt[transitionProp] = prop + " " + options.shift_duration/options.msToS + "s ease 0s";
+						var opt = {};
+						if (transitionStr === null) {
+							transitionStr = [transformProp, " ", options.shift_duration/options.msToS, "s ease 0s"].join("");
+						}
+						opt[transitionProp] = transitionStr;
 						ul.css(opt);
 					}
 				},
@@ -187,7 +191,8 @@
 						element.stop();
 					}
 				};
-			setTransitions();
+				
+			// prevent webkit flicker	
 			if (transitionProp === "-webkit-transition") ul.css("-webkit-backface-visibility", "hidden");
 
 			// if prev/next buttons don't seem to be inside the container, look for them outside
