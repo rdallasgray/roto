@@ -100,11 +100,15 @@
 		// support both jQuery.animate and css transitions
 		var doAnimation = function(element, css, duration, easing, callback) {
 			if (transitionProp !== null) {
-				var opt = {};
+				var opt = {}, id = "rotoAnim" + new Date().getTime();
 				opt[transitionProp + "-duration"] = duration/options.msToS + "s";
 				opt[transitionProp + "-timing-function"] = ["cubic-bezier(", options[easing + "_bezier"].join(","), ")"].join("");
 				element.css(opt);
-				element.one(transitionEvent, callback);
+				element.data("animationCallback", callback);
+				element.one(transitionEvent, function() {
+					element.data("animationCallback", null);
+					callback();
+				});
 				element.css(css);
 			}
 			else {
@@ -141,6 +145,8 @@
 				rotoMeasure = 0,
 				// unique identification of the overall container, to be used in namespacing events
 				containerId = (typeof container.attr("id") !== undefined) ? container.attr("id") : new Date().getTime() + "",
+				// if transforms are supported, the string giving the css property to be animated
+				animatedProp = null,
 				// whether animations are running
 				running = false,
 				// cache of the previous and next button elements
@@ -171,6 +177,10 @@
 					if (transitionProp !== null) {
 						var offset = getCurrentOffset();
 						unsetTransitions();
+						if (typeof element.data("animationCallback") === "function") {
+							element.data("animationCallback")();
+							element.data("animationCallback", null);
+						}
 						ul.css(getAnimatedProp(offset));
 					}
 					else {
@@ -199,11 +209,14 @@
 			var getAnimatedProp = function(move) {
 				var opt = {};
 				if (transformProp !== null) {
-					var use3d = isTouchDevice ? "3d" : "",
-						translateStr = (use3d === "3d") ? "(Xpx,Ypx,0px)" : "(Xpx,Ypx)",
-						oppositeCoOrd = { X: "Y", Y: "X"};
-					opt[transformProp] = "translate" + use3d + 
-						translateStr.replace(dimensions.coOrd, move).replace(oppositeCoOrd[dimensions.coOrd], "0");
+					if (animatedProp === null) {
+						var use3d = isTouchDevice ? "3d" : "",
+							translateStr = (use3d === "3d") ? "(Xpx,Ypx,0px)" : "(Xpx,Ypx)",
+							oppositeCoOrd = { X: "Y", Y: "X"};
+						animatedProp = "translate" + use3d + 
+							translateStr.replace(oppositeCoOrd[dimensions.coOrd], "0");
+					}
+					opt[transformProp] = animatedProp.replace(dimensions.coOrd, move);
 				}
 				else {
 					opt[dimensions.offsetName] = move+"px";
