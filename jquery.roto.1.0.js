@@ -40,7 +40,7 @@
 			drift_duration: 1800,
 			drift_factor: 500,
 			drift_bezier: [0,0,0.6,1],
-			bounce_duration: 350,
+			bounce_duration: 400,
 			bounce_bezier: [0,0.5,0.5,1],
 			pull_divisor: 3,
 			timer_interval: 50,
@@ -73,15 +73,18 @@
 		(function() {
 			if (options.disable_transitions) return;
 			var body = document.body || document.documentElement,
+			prefixes = { generic: "", Moz: "-moz", Webkit: "-webkit", O: "-o", Ms: "-ms"  },
 				transform = {
 					transform: "transform", 
 					MozTransform: "-moz-transform", 
-					WebkitTransform: "-webkit-transform"
+					WebkitTransform: "-webkit-transform",
+					OTransform: "-o-transform"
 				},
 				transition = {
 					transition: { prop: "transition", "event": "transitionend" },
 					MozTransition: { prop: "-moz-transition", "event": "transitionend" },
-					WebkitTransition: { prop: "-webkit-transition", "event": "webkitTransitionEnd" }
+					WebkitTransition: { prop: "-webkit-transition", "event": "webkitTransitionEnd" },
+					OTransition: { prop: "-o-transition", "event": "OTransitionEnd" }
 				};
 			for (var i in transform) {
 				if (typeof body.style[i] !== "undefined") {
