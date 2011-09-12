@@ -267,7 +267,7 @@
 			// enable or disable the previous and next buttons based on roto conditions
 			var switchButtons = function() {
 				// if the total measure of the listElements extends beyond the end of the ul, enable the next button
-				if (rotoMeasure > (containerMeasure - currentOffset)) {
+				if (rotoMeasure > (containerMeasure - currentOffset - startOffset)) {
 					nextButton.removeAttr("disabled");
 				}
 				else nextButton.attr("disabled", "disabled");
@@ -310,7 +310,7 @@
 			
 			// track the ul to movement of the pointer
 			var rotoTrack = function(pointerMove) {
-				var move = Math.ceil(pointerMove + currentOffset);
+				var move = Math.ceil(pointerMove + currentOffset + startOffset);
 				// allow user to pull the ul beyond the max/min offsets
 				if (move < (maxOffset + containerMeasure/options.pull_divisor) && move > (minOffset - containerMeasure/options.pull_divisor)) {
 					ul.css(getAnimatedProp(move));
