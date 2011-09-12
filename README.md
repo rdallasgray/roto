@@ -42,10 +42,10 @@ What options do I have, and what are the defaults?
 --------------------------------------------------
 Lots of options. The ones you'll generally want to use are:
 
-btnPrev: the css selector for the 'Previous' button. Default is '.prev'.
-btnNext: the css selector for the 'Next' button. Default is '.next'.
-direction: 'h' for horizontal, 'v' for vertical. Default is 'h'.
-snap: whether to snap individual listitems. Default is true.
+- btnPrev: the css selector for the 'Previous' button. Default is '.prev'.
+- btnNext: the css selector for the 'Next' button. Default is '.next'.
+- direction: 'h' for horizontal, 'v' for vertical. Default is 'h'.
+- snap: whether to snap individual listitems. Default is true.
 
 That's all. Power users have more options and should read the source and experiment.
 
