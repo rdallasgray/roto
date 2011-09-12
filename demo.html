@@ -32,7 +32,7 @@
 			<button class="next">Next</button>
 		</div>
 
-		<h3>A fixed width horizontal roto:</h3>
+		<h3>A fixed width horizontal roto with snapping:</h3>
 		<div id="fixed">
 			<ul>
 				<li><img src="test-images/roto-test-01.jpg"/></li>
@@ -80,7 +80,7 @@
 		<button id="vertical-single-prev">Previous</button>
 		<button id="vertical-single-next">Next</button>
 		
-		<h3>A vertical, multiple roto:</h3>
+		<h3>A vertical, multiple roto with snapping:</h3>
 		<div id="vertical-multi">
 			<ul>
 				<li><img src="test-images/roto-test-01.jpg"/></li>
@@ -126,8 +126,10 @@
 	</body>
 	<script type="text/javascript">
 	$(window).load(function() {
-		$("#simple, #fixed, #text").roto();
-		$("#vertical-single, #vertical-multi").roto({ direction: "v" });
+		$("#simple, #text").roto({ snap: false });
+		$("#fixed").roto();
+		$("#vertical-single").roto({ direction: "v", snap: false });
+		$("#vertical-multi").roto({ direction: "v" });
 	});
 	</script>
 </html>

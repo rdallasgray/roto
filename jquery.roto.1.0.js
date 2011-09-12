@@ -45,7 +45,8 @@
 			pull_divisor: 3,
 			timer_interval: 50,
 			msToS: 1000,
-			disable_transitions: false
+			disable_transitions: false,
+			snap: true
 		};
 		options = $.extend(defaults, options || {});
 
@@ -211,8 +212,11 @@
 			var remeasure = function() {
 				containerMeasure = Math.ceil(ul.parent()[dimensions.measure.toLowerCase()]()),
 				minOffset = Math.ceil(rotoMeasure - containerMeasure + startOffset) * -1;
+				if (options.snap) {
+					minOffset = getSnapMove(minOffset, 1);
+				}
 			};
-		
+
 			// get the css property to animate based on whether transforms are supported
 			var getAnimatedProp = function(move) {
 				var opt = {};
@@ -241,8 +245,23 @@
 				
 				if (matches === null) return cssPosition;
 				
-				var val = dimensions.coOrd === 'X' ? matches[4] : matches[5];
+				var val = (dimensions.coOrd === 'X') ? matches[4] : matches[5];
 				return parseInt(val);
+			};
+			
+			// find the list element nearest the given offset
+			var getSnapMove = function(offset, dir) {
+				var pos = 0, _pos = 0;
+				$.each(listElements, function(idx, el) {
+					// set pos to the position of the current listElement
+					pos = -1 * Math.ceil($(el).position()[dimensions.offsetName]);
+					// if the position is beyond the offset, break the loop
+					if (pos <= offset) {
+						return false;
+					}
+					_pos = pos;
+				});
+				return (dir > 0) ? pos : _pos;
 			};
 
 			// enable or disable the previous and next buttons based on roto conditions
@@ -262,6 +281,7 @@
 		
 			// shift the listElements one ul width in the given direction
 			var rotoShift = function(dir) {
+				var move = 0;
 				// do nothing if the animation is already running
 				if (running) return;
 				running = true;
@@ -275,38 +295,16 @@
 						running = false;
 					});
 				};
-			
-				// internal function to find the list element nearest the given offset
-				var getNearestVisibleListElement = function(offset) {
-					
-					var pos = 0, li = listElements.get(0);
-					$.each(listElements, function(idx, el) {
-						// set pos to the position of the current listElement
-						pos = -1 * Math.ceil($(el).position()[dimensions.offsetName]);
-						// if the position of the current listElement is beyond the offset, break the loop
-						if (pos < offset) {
-							return false;
-						}
-						// set li to the current listElement
-						li = el;
-					});
-					return li;
-				};
 
-				switch(dir) {
-					case 'prev':
-					// if we're moving backwards, find the element one container width towards the start of the container
-					var offsetElement = getNearestVisibleListElement(currentOffset + containerMeasure);
-					break;
-					
-					case 'next':
+				if (dir < 0) {
 					// if we're moving forwards, find the element nearest the end of the container
-					var offsetElement = getNearestVisibleListElement(currentOffset - containerMeasure);
-					break;
+					move = Math.max(getSnapMove(currentOffset - containerMeasure, dir), minOffset);
+				}
+				else {
+					// if we're moving backwards, find the element one container width towards the start of the container
+					move = getSnapMove(currentOffset + containerMeasure, dir);
 				}
 				// move the offsetElement to the start of the container
-				var newOffset = Math.ceil($(offsetElement).position()[dimensions.offsetName]);
-				var move = -1 * (containerMeasure - (containerMeasure - newOffset));
 				doShift(move);
 			};
 			
@@ -323,25 +321,24 @@
 			var rotoDrift = function() {
 				var speed_dir = timer.getPointerSpeed(),
 					speed = speed_dir[0], dir = speed_dir[1];
-				if (speed === 0) return;
-				
+				if (speed === 0 && !options.snap) {
+					switchButtons();
+					return;
+				}
 				// distance to rotoDrift
 				var distance = speed * options.drift_factor * dir,
 					move = distance + currentOffset;
 				if (move > maxOffset) move = maxOffset;
-				if (move < minOffset) move = minOffset;
+				else if (move < minOffset) move = minOffset;
+				else if (options.snap) move = getSnapMove(move, dir);
 				doAnimation(ul, getAnimatedProp(move), options.drift_duration, "drift", function() {
-					currentOffset = getCurrentOffset() - startOffset;
-					if (currentOffset > maxOffset) {
-						bounceBack(false);
-					}
 					switchButtons();
 				});
 			};
 			
 			// bounce the ul elastically after it's pulled beyond max or min offsets
 			var bounceBack = function(dir) {
-				var end = dir ? minOffset : maxOffset;
+				var end = (dir < 0) ? minOffset : maxOffset;
 				doAnimation(ul, getAnimatedProp(end), options.bounce_duration, "bounce", function() {
 					currentOffset = end - startOffset;
 					switchButtons();
@@ -439,7 +436,7 @@
 					setTransitions();
 					currentOffset = getCurrentOffset();
 					if (currentOffset > maxOffset || currentOffset < minOffset) {
-						bounceBack(currentOffset < minOffset); 
+						bounceBack(currentOffset - maxOffset);
 					}
 					else {
 						rotoDrift();
@@ -462,12 +459,12 @@
 
 			if (options.btnPrev) {
 				prevButton.click(function() {
-					return rotoShift("prev");
+					return rotoShift(1);
 				});
 			}
 			if (options.btnNext) {
 				nextButton.click(function() {
-					return rotoShift("next");
+					return rotoShift(-1);
 				});
 			}
 
