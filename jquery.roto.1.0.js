@@ -74,18 +74,15 @@
 		(function() {
 			if (options.disable_transitions) return;
 			var body = document.body || document.documentElement,
-			prefixes = { generic: "", Moz: "-moz", Webkit: "-webkit", O: "-o", Ms: "-ms"  },
 				transform = {
 					transform: "transform", 
 					MozTransform: "-moz-transform", 
 					WebkitTransform: "-webkit-transform",
-					OTransform: "-o-transform"
 				},
 				transition = {
 					transition: { prop: "transition", "event": "transitionend" },
 					MozTransition: { prop: "-moz-transition", "event": "transitionend" },
 					WebkitTransition: { prop: "-webkit-transition", "event": "webkitTransitionEnd" },
-					OTransition: { prop: "-o-transition", "event": "OTransitionEnd" }
 				};
 			for (var i in transform) {
 				if (typeof body.style[i] !== "undefined") {
