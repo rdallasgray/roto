@@ -1,20 +1,13 @@
 What is Roto?
 =============
-Roto is a simple, flexible, touch-capable image spinner plugin for jQuery.
+A simple, flexible, touch-capable scrolling plugin for jQuery.
 See a demo at http://www.pausebuttonedit.com/roto/demo.html
 
-You may think another jQuery image spinner is the last thing the world needs. Well, none of the existing ones entirely met my reqirements -- so I wrote Roto.
+Roto takes an html unordered list (of anything) and makes it smoothly, swipeably scrollable on both desktop and touch devices.
 
+Example uses include image carousels, listboxes, slideshows, etc.
 
-What are these stringent and esoteric requirements?
-
-1. I wanted it to work nicely with touch devices, and to be familiar to users of touch devices when working on a desktop browser. Roto does this by aping the iPhone's inertial scrolling when clicked and dragged; you can point your finger or your mouse pointer at it, swipe, and the images whirl by. Then you can point again to stop the whirl, or slowly drag to exactly the image you want to see. If you get to the end of the scroll travel, it lets you pull a bit and then does a nice bounce back.
-
-2. I wanted it to have a simple button-based fallback for users more comfortable with that, and for the buttons to work in a sensible way. Roto doesn't advance or retreat image-by-image when you press the Previous or Next buttons: it advances by its entire width, so you see the next SET of images, not the next image in the queue. Much quicker.
-
-3. I wanted it to be simple and flexible. You can pass Roto all sorts of options, or none at all. You can put the buttons anywhere you like, or nowhere at all. You can have vertical or horizontal rotos; rotos can contain anything you can put in an html listitem, not just images; you can stack up your images in a grid and it'll still work. You can have working links in the roto; you can use it with Fancybox. All done without major headaches.
-
-4. I wanted it to be supplied with a minimum of styling. I'm a designer, so I'll do the styling, thanks. I don't need any funny-looking skins -- just the functionality.
+Roto comes with a minimum of styling, so that you can make it look and behave however you want. It plays nicely with other plugins (Fancybox being an example), making it lightweight but very functional and flexible.
 
 
 How do I use it?
