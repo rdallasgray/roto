@@ -62,7 +62,7 @@ Otherwise, you shouldn't need to treat Roto with kid gloves. It'll take most of 
 
 What doesn't work?
 ------------------
-It might not work in IE6. I haven't tested it. Life's too short.
+It might not work in IE6. I haven't tested it. Life's too short!
 
 
 Acknowledgements

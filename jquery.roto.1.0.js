@@ -141,8 +141,8 @@
 				maxOffset = 0,
 				// the minimum offset from starting position that the roto can be moved (to be calculated below)
 				minOffset = 0,
-				// the current offset position, set at maxOffset = starting position
-				currentOffset = maxOffset,
+				// the offset to pointer tracking
+				trackingOffset = 0,
 				// the inner width or height of the container element
 				containerMeasure = 0,
 				// the total width or height of the contents of the ul element
@@ -251,29 +251,30 @@
 			
 			// find the list element nearest the given offset
 			var getSnapMove = function(offset, dir) {
-				var pos = 0, _pos = 0;
-				$.each(listElements, function(idx, el) {
+				var pos = _pos = maxOffset,
+					lis = (dir > 0) ? listElements.get().reverse() : listElements;
+				$.each(lis, function(idx, el) {
 					// set pos to the position of the current listElement
 					pos = -1 * Math.ceil($(el).position()[dimensions.offsetName]);
 					// if the position is beyond the offset, break the loop
-					if (pos <= offset) {
+					if (pos * dir > offset * dir) {
 						return false;
 					}
 					_pos = pos;
 				});
-				return (dir > 0) ? pos : _pos;
+				return _pos;
 			};
 
 			// enable or disable the previous and next buttons based on roto conditions
 			var switchButtons = function() {
 				// if the total measure of the listElements extends beyond the end of the ul, enable the next button
-				if (rotoMeasure > (containerMeasure - currentOffset - startOffset)) {
+				if (rotoMeasure > (containerMeasure - getCurrentOffset())) {
 					nextButton.removeAttr("disabled");
 				}
 				else nextButton.attr("disabled", "disabled");
 
 				// if the listElements are offset beyond the start of the ul, enable the previous button
-				if (currentOffset + startOffset < maxOffset) {
+				if (getCurrentOffset() < maxOffset) {
 					prevButton.removeAttr("disabled");
 				}
 				else prevButton.attr("disabled", "disabled");
@@ -290,7 +291,6 @@
 				// internal function to move the listElements by the calculated amount
 				var doShift = function(move) {
 					doAnimation(ul, getAnimatedProp(move), options.shift_duration, "shift", function() {
-						currentOffset = move;
 						switchButtons();
 						running = false;
 					});
@@ -298,11 +298,11 @@
 
 				if (dir < 0) {
 					// if we're moving forwards, find the element nearest the end of the container
-					move = Math.max(getSnapMove(currentOffset - containerMeasure, dir), minOffset);
+					move = Math.max(getSnapMove(getCurrentOffset() - containerMeasure, dir), minOffset);
 				}
 				else {
 					// if we're moving backwards, find the element one container width towards the start of the container
-					move = getSnapMove(currentOffset + containerMeasure, dir);
+					move = Math.min(getSnapMove(getCurrentOffset() + containerMeasure, dir), maxOffset);
 				}
 				// move the offsetElement to the start of the container
 				doShift(move);
@@ -310,7 +310,7 @@
 			
 			// track the ul to movement of the pointer
 			var rotoTrack = function(pointerMove) {
-				var move = Math.ceil(pointerMove + currentOffset + startOffset);
+				var move = Math.ceil(pointerMove + trackingOffset);
 				// allow user to pull the ul beyond the max/min offsets
 				if (move < (maxOffset + containerMeasure/options.pull_divisor) && move > (minOffset - containerMeasure/options.pull_divisor)) {
 					ul.css(getAnimatedProp(move));
@@ -321,13 +321,13 @@
 			var rotoDrift = function() {
 				var speed_dir = timer.getPointerSpeed(),
 					speed = speed_dir[0], dir = speed_dir[1];
-				if (speed === 0 && !options.snap) {
+				if (speed === 0) {
 					switchButtons();
-					return;
+					if (!options.snap) return;
 				}
 				// distance to rotoDrift
 				var distance = speed * options.drift_factor * dir,
-					move = distance + currentOffset;
+					move = distance + getCurrentOffset();
 				if (move > maxOffset) move = maxOffset;
 				else if (move < minOffset) move = minOffset;
 				else if (options.snap) move = getSnapMove(move, dir);
@@ -340,7 +340,6 @@
 			var bounceBack = function(dir) {
 				var end = (dir < 0) ? minOffset : maxOffset;
 				doAnimation(ul, getAnimatedProp(end), options.bounce_duration, "bounce", function() {
-					currentOffset = end - startOffset;
 					switchButtons();
 				});
 			};
@@ -389,6 +388,7 @@
 			ul.bind(scrollEvents.start + ".roto." + containerId, function(e) {
 				stopAnimation(ul);
 				switchButtons();
+				trackingOffset = getCurrentOffset();
 				var linkElements = ul.find("a"),
 					oldLinkEvents = {};
 
@@ -419,7 +419,6 @@
 				}
 				e = wrapScrollEvent(e);
 				var startCoOrd = e["screen"+dimensions.coOrd];
-				currentOffset = getCurrentOffset() - startOffset;
 				timer.setCurrentCoOrd(startCoOrd);
 
 				// scrolling has started, so begin tracking pointer movement and measuring speed
@@ -434,9 +433,8 @@
 				$(document).one(scrollEvents.end, function() {
 					timer.stop();
 					setTransitions();
-					currentOffset = getCurrentOffset();
-					if (currentOffset > maxOffset || currentOffset < minOffset) {
-						bounceBack(currentOffset - maxOffset);
+					if (getCurrentOffset() > maxOffset || getCurrentOffset() < minOffset) {
+						bounceBack(getCurrentOffset() - maxOffset);
 					}
 					else {
 						rotoDrift();
