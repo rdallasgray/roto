@@ -23,7 +23,7 @@ See the demo for an example.
 
 Are there dependencies?
 -----------------------
-The only dependency is my own Bez plugin (https://github.com/rdallasgray/bez), which is used to create jQuery-compatible easing functions from cubic-bezier co-ordinates. That's just for compatibility with browsers which don't support CSS transitions, so if you're only supporting newer browsers, you don't need it. Bez is compiled into the minified distribution of Roto, so you don't need to separately include it.
+The only dependency is my own Bez plugin (https://github.com/rdallasgray/bez), which is used to create jQuery-compatible easing functions from cubic-bezier co-ordinates. That's just for compatibility with browsers which don't support CSS transitions, so if you're only supporting newer browsers, you don't need it. Bez is compiled into the minified distribution of Roto by default, so you don't need to separately include it.
 
 
 What else do I need to know?
