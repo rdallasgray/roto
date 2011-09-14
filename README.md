@@ -1,7 +1,7 @@
 What is Roto?
 =============
 A simple, flexible, touch-capable scrolling plugin for jQuery.
-See a demo at http://www.pausebuttonedit.com/roto/demo.html
+See a demo at http://www.pausebuttonedit.com/roto/demo/index.html
 
 Roto takes an html unordered list (of anything) and makes it smoothly, swipeably scrollable on both desktop and touch devices.
 
