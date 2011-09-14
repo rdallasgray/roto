@@ -1,6 +1,7 @@
 PROJECT = Roto
 SRC_DIR = src
 BUILD_DIR = .
+DEMO_DIR = demo
 MAIN = jquery.roto
 BEZ = lib/bez/jquery.bez.min.js
 
@@ -10,7 +11,7 @@ COMPILER ?= `which uglifyjs`
 VERSION = $(shell git describe --tags --long | sed s/\-/\./)
 YEAR = $(shell date +"%Y")
 
-all: main min bez clean
+all: main min bez copy_demo clean
 
 nomin: main bez clean
 
@@ -38,8 +39,12 @@ min:
 
 bez:
 	@@echo "Attaching Bez to Roto"
-	@@cat ${BEZ} ${MAIN}.min.js > ${MAIN}.tmp
-	@@cp ${MAIN}.tmp ${MAIN}.min.js
+	@@cat ${BEZ} ${BUILD_DIR}/${MAIN}.min.js > ${BUILD_DIR}/${MAIN}.tmp
+	@@cp ${BUILD_DIR}/${MAIN}.tmp ${BUILD_DIR}/${MAIN}.min.js
+
+copy_demo:
+	@@echo "Copying ${MAIN}.min.js to ${DEMO_DIR}"
+	@@cp ${BUILD_DIR}/${MAIN}.min.js ${DEMO_DIR} 
 
 clean:
 	@@echo "Removing temp files"
