@@ -1,0 +1,3 @@
+[submodule "lib/bez"]
+	path = lib/bez
+	url = git://github.com/rdallasgray/bez.git
