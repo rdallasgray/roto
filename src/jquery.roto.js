@@ -188,7 +188,7 @@
 				containerMeasure = Math.ceil(ul.parent()[dimensions.measure.toLowerCase()]()),
 				minOffset = Math.ceil(rotoMeasure - containerMeasure + startOffset) * -1;
 				if (options.snap) {
-					minOffset = getSnapMove(minOffset, 1);
+					minOffset = getSnapMove(minOffset, -1);
 				}
 			};
 
@@ -226,8 +226,7 @@
 			
 			// find the list element nearest the given offset
 			var getSnapMove = function(offset, dir) {
-				console.debug("snapMove: " + offset + ", " + dir);
-				var pos = _pos = maxOffset,
+				var pos = maxOffset,
 					lis = (dir > 0) ? listElements.get().reverse() : listElements;
 				$.each(lis, function(idx, el) {
 					// set pos to the position of the current listElement
@@ -236,9 +235,8 @@
 					if (pos * dir > offset * dir) {
 						return false;
 					}
-					_pos = pos;
 				});
-				return _pos;
+				return pos;
 			};
 
 			// enable or disable the previous and next buttons based on roto conditions
@@ -301,6 +299,7 @@
 					switchButtons();
 					if (!options.snap) return;
 				}
+				if (dir === 0) return;
 				// distance to rotoDrift
 				var distance = speed * options.drift_factor * dir,
 					move = distance + getCurrentOffset();
@@ -322,14 +321,13 @@
 						
 			// timer to calculate speed of pointer movement
 			var timer = function() {
-				var startCoOrd = 0,
-					currentCoOrd = 0,
+				var startCoOrd = 0, currentCoOrd = 0, initialCoOrd = 0,
 					chunker = null,
 					chunk = { startCoOrd: 0, endCoOrd: 0 };
 				
 				return {
 					start: function() {
-						startCoOrd = currentCoOrd;
+						initialCoOrd = startCoOrd = currentCoOrd;
 						//only measure speed in the final 50ms of movement
 						chunker = window.setInterval(function() {
 							chunk.startCoOrd = startCoOrd;
@@ -345,7 +343,8 @@
 						var translation = chunk.endCoOrd - chunk.startCoOrd,
 						 	distance = Math.abs(translation),
 							speed = distance/options.timer_interval,
-							dir = translation < 0 ? -1 : 1;
+							dir_value = (translation === 0) ? chunk.endCoOrd - initialCoOrd : translation,
+							dir = (dir_value <= 0) ? ((dir_value === 0) ? 0 : -1) : 1;
 						return [speed, dir];
 					},
 					setCurrentCoOrd: function(coOrd) {
