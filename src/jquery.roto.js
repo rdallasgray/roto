@@ -122,6 +122,7 @@
 			ul.css({ position: "relative", whiteSpace: "nowrap", padding: 0, margin: 0 });
 			listItems.css({ display: "block", "float": "left", listStyle: "none" });
 			
+			var changes = 0;
 			// set up transitions
 			var setTransitions = function() {
 					if (transitionProp !== null) {
@@ -142,20 +143,29 @@
 				},
 				// support both jQuery.animate and css transitions
 				doAnimation = function(element, css, duration, easing, callback) {
+					var _callback = callback;
+					if (!changeEventPrimed) {
+						_callback = function() {
+							notifyChanged();
+							callback();
+						}
+						changeEventPrimed = true;
+					}
 					if (transitionProp !== null) {
 						var opt = {};
 						opt[transitionProp + "-duration"] = duration/msToS + "s";
 						opt[transitionProp + "-timing-function"] = ["cubic-bezier(", options[easing + "_bezier"].join(","), ")"].join("");
 						element.css(opt);
-						element.data("animationCallback", callback);
+						element.data("animationCallback", _callback);
+						element.unbind(transitionEvent);
 						element.one(transitionEvent, function() {
 							element.data("animationCallback", null);
-							callback();
+							_callback();
 						});
 						element.css(css);
 					}
 					else {
-						element.animate(css, duration, $.bez(options[easing + "_bezier"]), callback);
+						element.animate(css, duration, $.bez(options[easing + "_bezier"]), _callback);
 					}
 				},
 				stopAnimation = function(element) {
@@ -173,7 +183,7 @@
 					}
 				},
 				notifyChanged = function() {
-					container.trigger("rotoChange", [getNearestListItemTo(getCurrentOffset(), lastValidDir)]);
+					container.trigger("rotoChange", [getNearestListItemTo(getCurrentOffset(), lastValidDir)[0]]);
 					changeEventPrimed = false;
 				};
 				
@@ -310,7 +320,10 @@
 					speed = speed_dir[0], dir = speed_dir[1];
 				if (speed === 0) {
 					switchButtons();
-					if (!options.snap) return;
+					if (!options.snap) {
+						if (!changeEventPrimed && trackingOffset !== getCurrentOffset()) notifyChanged();
+						return;
+					};
 				}
 				// distance to rotoDrift
 				var distance = speed * options.drift_factor * dir,
@@ -318,6 +331,7 @@
 				if (move > maxOffset) move = maxOffset;
 				else if (move < minOffset) move = minOffset;
 				else if (options.snap) move = getSnapMove(move, dir);
+				
 				doAnimation(ul, getAnimatedProp(move), options.drift_duration, "drift", function() {
 					switchButtons();
 				});
