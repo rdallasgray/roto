@@ -100,6 +100,7 @@
 	</body>
 	<script type="text/javascript">
 	$(window).load(function() {
+	    $(window).bind("rotoChange", function(e, d) { console.debug(d); });
 		$("#carousel").roto({ snap: false });
 		$("#slideshow").roto();
 		$("#listbox").roto({ direction: "v" });
