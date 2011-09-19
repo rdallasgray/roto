@@ -144,7 +144,7 @@
 				// support both jQuery.animate and css transitions
 				doAnimation = function(element, css, duration, easing, callback) {
 					var _callback = callback;
-					if (!changeEventPrimed) {
+					if (!changeEventPrimed || transitionProp === null) {
 						_callback = function() {
 							notifyChanged();
 							callback();
@@ -321,7 +321,7 @@
 				if (speed === 0) {
 					switchButtons();
 					if (!options.snap) {
-						if (!changeEventPrimed && trackingOffset !== getCurrentOffset()) notifyChanged();
+						if ((!changeEventPrimed || transitionProp === null) && trackingOffset !== getCurrentOffset()) notifyChanged();
 						return;
 					};
 				}

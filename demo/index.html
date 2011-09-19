@@ -3,6 +3,7 @@
 	<head>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
 		<script type="text/javascript" src="../src/jquery.roto.js"></script>
+		<script type="text/javascript" src="../lib/bez/jquery.bez.min.js"></script>
 		<link rel="stylesheet" href="roto.css">
 	</head>
 	<body>
@@ -99,8 +100,8 @@
 
 	</body>
 	<script type="text/javascript">
+	$(window).bind("rotoChange", function(e, d) { console.debug(d); });
 	$(window).load(function() {
-	    $(window).bind("rotoChange", function(e, d) { console.debug(d); });
 		$("#carousel").roto({ snap: false });
 		$("#slideshow").roto();
 		$("#listbox").roto({ direction: "v" });
