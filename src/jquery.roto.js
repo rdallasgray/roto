@@ -17,7 +17,7 @@
 			shift_bezier: [0,0,0,1],
 			drift_duration: 1800,
 			drift_factor: 500,
-			drift_bezier: [0,0,0.6,1],
+			drift_bezier: [0,0,0.3,1],
 			bounce_duration: 400,
 			bounce_bezier: [0,0.5,0.5,1],
 			pull_divisor: 3,
@@ -118,6 +118,8 @@
 				minOffset = 0,
 				// the offset to pointer tracking
 				trackingOffset = 0,
+				// the last non-zero direction of travel measured
+				lastValidDir = -1,
 				// the inner width or height of the container element
 				containerMeasure = 0,
 				// the total width or height of the contents of the ul element
@@ -200,13 +202,13 @@
 						var use3d = isTouchDevice ? "3d" : "",
 							translateStr = (use3d === "3d") ? "(Xpx,Ypx,0px)" : "(Xpx,Ypx)",
 							oppositeCoOrd = { X: "Y", Y: "X"};
-						animatedProp = "translate" + use3d + 
-							translateStr.replace(oppositeCoOrd[dimensions.coOrd], "0");
+						animatedProp = ["translate", use3d, 
+							translateStr.replace(oppositeCoOrd[dimensions.coOrd], "0")].join("");
 					}
 					opt[transformProp] = animatedProp.replace(dimensions.coOrd, move);
 				}
 				else {
-					opt[dimensions.offsetName] = move+"px";
+					opt[dimensions.offsetName] = move + "px";
 				}
 				return opt;
 			};
@@ -224,19 +226,26 @@
 				return parseInt(val);
 			};
 			
-			// find the list element nearest the given offset
-			var getSnapMove = function(offset, dir) {
+			// find the list element nearest the given offset, and its position
+			var getNearestListItemTo = function(offset, dir) {
 				var pos = maxOffset,
-					lis = (dir > 0) ? listElements.get().reverse() : listElements;
+					dir = (dir === 0) ? lastValidDir : dir,
+					lis = (dir > 0) ? listElements.get().reverse() : listElements,
+					el = listElements.get(0);
 				$.each(lis, function(idx, el) {
 					// set pos to the position of the current listElement
 					pos = -1 * Math.ceil($(el).position()[dimensions.offsetName]);
 					// if the position is beyond the offset, break the loop
-					if (pos * dir > offset * dir) {
+					if (pos * dir >= offset * dir) {
 						return false;
 					}
 				});
-				return pos;
+				return [el, pos];
+			};
+			
+			// get the position of the listitem nearest the given offset
+			var getSnapMove = function(offset, dir) {
+				return getNearestListItemTo(offset, dir)[1];
 			};
 
 			// enable or disable the previous and next buttons based on roto conditions
@@ -299,7 +308,6 @@
 					switchButtons();
 					if (!options.snap) return;
 				}
-				if (dir === 0) return;
 				// distance to rotoDrift
 				var distance = speed * options.drift_factor * dir,
 					move = distance + getCurrentOffset();
@@ -345,6 +353,7 @@
 							speed = distance/options.timer_interval,
 							dir_value = (translation === 0) ? chunk.endCoOrd - initialCoOrd : translation,
 							dir = (dir_value <= 0) ? ((dir_value === 0) ? 0 : -1) : 1;
+						if (dir !== 0) lastValidDir = dir;
 						return [speed, dir];
 					},
 					setCurrentCoOrd: function(coOrd) {
