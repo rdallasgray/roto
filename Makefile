@@ -39,7 +39,9 @@ min:
 
 bez:
 	@@echo "Attaching Bez to Roto"
-	@@cat ${BEZ} ${BUILD_DIR}/${MAIN}.min.js > ${BUILD_DIR}/${MAIN}.tmp
+	@@cp ${BEZ} ${BUILD_DIR}/${MAIN}.tmp
+	@@cat ${BUILD_DIR}/${MAIN}.min.js >> ${BUILD_DIR}/${MAIN}.tmp
+	@@echo ";" >> ${BUILD_DIR}/${MAIN}.tmp
 	@@cp ${BUILD_DIR}/${MAIN}.tmp ${BUILD_DIR}/${MAIN}.min.js
 
 copy_demo:

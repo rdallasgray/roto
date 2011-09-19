@@ -226,6 +226,7 @@
 			
 			// find the list element nearest the given offset
 			var getSnapMove = function(offset, dir) {
+				console.debug("snapMove: " + offset + ", " + dir);
 				var pos = _pos = maxOffset,
 					lis = (dir > 0) ? listElements.get().reverse() : listElements;
 				$.each(lis, function(idx, el) {
