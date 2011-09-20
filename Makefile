@@ -52,3 +52,17 @@ clean:
 	@@echo "Removing temp files"
 	@@rm -f ${BUILD_DIR}/${MAIN}.tmp
 	@@echo "Done"
+
+pages:
+	@@echo "Updating gh-pages"
+	@@git checkout gh-pages
+	@@rm -R lib
+	@@git archive master -o tmp.zip /demo
+	@@unzip tmp.zip
+	@@cp -R demo/* .
+	@@rm tmp.zip
+	@@rm -R demo
+	@@git add *
+	@@git commit -a -m "Updated demo to ${VERSION}"
+	@@git checkout master
+	@@echo "Done"
