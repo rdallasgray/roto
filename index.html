@@ -2,13 +2,13 @@
 <html lang="en">
 	<head>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
-		<script type="text/javascript" src="jquery.roto.min.js"></script>
+        <script type="text/javascript" src="jquery.roto.min.js"></script>
 		<link rel="stylesheet" href="roto.css">
 	</head>
 	<body>
 		<h1>Roto demo</h1>
 		<h3>A flexible-width image carousel:</h3>
-		<div id="carousel">
+		<div id="carousel" class="roto">
 			<ul>
 				<li><img src="test-images/roto-test-01.jpg"/></li>
 				<li><img src="test-images/roto-test-02.jpg"/></li>
@@ -32,7 +32,7 @@
 		</div>
 
 		<h3>A slideshow:</h3>
-		<div id="slideshow">
+		<div id="slideshow" class="roto">
 			<ul>
 				<li><span>Slide 1</span></li>
 				<li>Slide 2</li>
@@ -46,7 +46,7 @@
 		<button id="slideshow-next">Next</button>
 		
 		<h3>A listbox:</h3>
-		<div id="listbox">
+		<div id="listbox" class="roto">
 			<ul>
 				<li>List item 1</li>
 				<li>List item 2</li>
@@ -74,7 +74,7 @@
 		<button id="listbox-next">Next</button>
 		
 		<h3>A vertical, multiple carousel with snapping:</h3>
-		<div id="vertical-multi">
+		<div id="vertical-multi" class="roto">
 			<ul>
 				<li><img src="test-images/roto-test-01.jpg"/></li>
 				<li><img src="test-images/roto-test-02.jpg"/></li>
@@ -104,6 +104,7 @@
 		$("#slideshow").roto();
 		$("#listbox").roto({ direction: "v" });
 		$("#vertical-multi").roto({ direction: "v" });
+		$(".roto").css("visibility", "visible");
 	});
 	</script>
 </html>
