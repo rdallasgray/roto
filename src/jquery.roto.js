@@ -22,7 +22,6 @@
 			bounce_bezier: [0,0.5,0.5,1],
 			pull_divisor: 3,
 			timer_interval: 50,
-			msToS: 1000,
 			disable_transitions: false,
 			snap: true
 		};

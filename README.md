@@ -28,7 +28,7 @@ The only dependency is my own Bez plugin (https://github.com/rdallasgray/bez), w
 
 What else do I need to know?
 ----------------------------
-Roto works best if you call it using $(window).load() rather than $(document).ready(). This is because Webkit-based browsers don't know the dimensions of images at $(document).ready() time, and Roto relies on those dimensions. Of course, if you're giving all your images explicit dimensions anyway, you can use $(document).ready().
+Roto works best if you call it using $(window).load() rather than $(document).ready(). This is because Webkit-based browsers don't know the dimensions of images at $(document).ready() time, and Roto relies on those dimensions. This can mean you see a 'Flash of Unstyled Content' as the script hasn't applied styles to the rotoed elements before the page begins to display, so you may want to style your rotoed elements with "visibility: hidden" until the window is loaded. Of course, if you're giving all your images explicit dimensions anyway, you can use $(document).ready().
 
 Roto also fires an event called 'rotoChange' when the position of the roto content is changed (and on completion of any animations). You can listen for this event on the rotoed container and use it, for example, to change other content in your page when the roto is moved. The event passes the listitem leftmost or topmost in the roto as data. So you could do something like:
 
