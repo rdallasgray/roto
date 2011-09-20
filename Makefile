@@ -55,10 +55,11 @@ clean:
 
 pages:
 	@@echo "Updating gh-pages"
+	@@git checkout master
 	@@git add *
 	@@git commit -a -m "Ensured master up to date before gh-pages update"
 	@@git checkout gh-pages
-	@@rm -R lib
+	@@rm -Rf lib
 	@@git archive master -o tmp.zip /demo
 	@@unzip tmp.zip
 	@@cp -R demo/* .
