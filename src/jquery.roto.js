@@ -225,13 +225,11 @@
 						// set pos to the position of the current listItem
 						pos = -1 * Math.ceil($(el).position()[dimensions.offsetName]);
 						li = el;
-						console.debug(pos, offset, dir);
 						// if the position is beyond the offset, break the loop
 						if (pos * dir >= offset * dir) {
 							return false;
 						}
 					});
-					console.debug(li, pos);
 					return [li, pos];
 				},
 				
