@@ -244,16 +244,17 @@
 				var pos = maxOffset,
 					dir = (dir === 0) ? lastValidDir : dir,
 					lis = (dir > 0) ? listItems.get().reverse() : listItems,
-					el = listItems.get(0);
+					li = listItems.get(0);
 				$.each(lis, function(idx, el) {
 					// set pos to the position of the current listItem
 					pos = -1 * Math.ceil($(el).position()[dimensions.offsetName]);
+					li = el;
 					// if the position is beyond the offset, break the loop
 					if (pos * dir >= offset * dir) {
 						return false;
 					}
 				});
-				return [el, pos];
+				return [li, pos];
 			};
 			
 			// get the position of the listitem nearest the given offset
