@@ -2,7 +2,9 @@
 <html lang="en">
 	<head>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
-        <script type="text/javascript" src="jquery.roto.min.js"></script>
+<!--        <script type="text/javascript" src="jquery.roto.min.js"></script> //-->
+        <script type="text/javascript" src="../lib/bez/jquery.bez.min.js"></script>
+        <script type="text/javascript" src="../src/jquery.roto.js"></script>
 		<link rel="stylesheet" href="roto.css">
 	</head>
 	<body>
@@ -34,12 +36,12 @@
 		<h3>A slideshow:</h3>
 		<div id="slideshow" class="roto">
 			<ul>
-				<li><span>Slide 1</span></li>
-				<li>Slide 2</li>
-				<li>Slide 3</li>
-				<li>Slide 4</li>
-				<li>Slide 5</li>
-				<li>Slide 6</li>
+				<li id="s1" id="s1">Slide 1</li>
+				<li id="s2">Slide 2</li>
+				<li id="s3">Slide 3</li>
+				<li id="s4">Slide 4</li>
+				<li id="s5">Slide 5</li>
+				<li id="s6">Slide 6</li>
 			</ul>
 		</div>
 		<button id="slideshow-prev">Previous</button>
@@ -48,26 +50,26 @@
 		<h3>A listbox:</h3>
 		<div id="listbox" class="roto">
 			<ul>
-				<li>List item 1</li>
-				<li>List item 2</li>
-				<li>List item 3</li>
-				<li>List item 4</li>
-				<li>List item 5</li>
-				<li>List item 6</li>
-				<li>List item 7</li>
-				<li>List item 8</li>
-				<li>List item 9</li>
-				<li>List item 10</li>
-				<li>List item 11</li>
-				<li>List item 12</li>
-				<li>List item 13</li>
-				<li>List item 14</li>
-				<li>List item 15</li>
-				<li>List item 16</li>
-				<li>List item 17</li>
-				<li>List item 18</li>
-				<li>List item 19</li>
-				<li>List item 20</li>
+				<li id="l1" id="l1">List item 1</li>
+				<li id="l2">List item 2</li>
+				<li id="l3">List item 3</li>
+				<li id="l4">List item 4</li>
+				<li id="l5">List item 5</li>
+				<li id="l6">List item 6</li>
+				<li id="l7">List item 7</li>
+				<li id="l8">List item 8</li>
+				<li id="l9">List item 9</li>
+				<li id="l10">List item 10</li>
+				<li id="l11">List item 11</li>
+				<li id="l12">List item 12</li>
+				<li id="l13">List item 13</li>
+				<li id="l14">List item 14</li>
+				<li id="l15">List item 15</li>
+				<li id="l16">List item 16</li>
+				<li id="l17">List item 17</li>
+				<li id="l18">List item 18</li>
+				<li id="l19">List item 19</li>
+				<li id="l20">List item 20</li>
 			</ul>
 		</div>
 		<button id="listbox-prev">Previous</button>
@@ -100,7 +102,7 @@
 	</body>
 	<script type="text/javascript">
 	$(window).load(function() {
-		$("#carousel").roto({ snap: false });
+		$("#carousel").roto({ snap: false/*, startOffset: 300, endOffset: 300*/ });
 		$("#slideshow").roto();
 		$("#listbox").roto({ direction: "v" });
 		$("#vertical-multi").roto({ direction: "v" });
