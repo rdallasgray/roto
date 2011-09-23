@@ -66,7 +66,7 @@
 				transition = {
 					transition: { prop: "transition", "event": "transitionend" },
 					MozTransition: { prop: "-moz-transition", "event": "transitionend" },
-					WebkitTransition: { prop: "-webkit-transition", "event": "webkitTransitionEnd" },
+					WebkitTransition: { prop: "-webkit-transition", "event": "webkitTransitionEnd" }
 				};
 			for (var i in transform) {
 				if (typeof body.style[i] !== "undefined") {
