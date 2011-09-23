@@ -226,10 +226,12 @@
 						pos = -1 * Math.ceil(_el.position()[dimensions.offsetName]);
 						li = el;
 						if (dir < 0) {
+							pos -= options.startOffset;
 							extent = (-1 * pos) + _el["outer" + dimensions.measure](true);
 							bound = -1 * offset;
 						}
 						else {
+							pos += options.endOffset;
 							extent = _el.prev().length > 0 ? pos + _el.prev()["outer" + dimensions.measure](true) : pos;
 							bound = offset;
 						}
@@ -324,11 +326,13 @@
 
 					if (dir < 0) {
 						// if we're moving forwards, find the element nearest the end of the container
-						move = Math.max(getSnapMove(getCurrentOffset() - containerMeasure, dir, false), minOffset);
+						console.debug(getCurrentOffset(), containerMeasure, options.startOffset);
+						move = Math.max(getSnapMove(getCurrentOffset() - containerMeasure + options.startOffset, dir, false), minOffset);
 					}
 					else {
 						// if we're moving backwards, find the element one container width towards the start of the container
-						move = Math.min(getSnapMove(getCurrentOffset() + containerMeasure, dir, false), maxOffset);
+						console.debug(getCurrentOffset(), containerMeasure, options.startOffset);
+						move = Math.min(getSnapMove(getCurrentOffset() + containerMeasure - options.endOffset, dir, false), maxOffset);
 					}
 					// move the offsetElement to the start of the container
 					doShift(move);

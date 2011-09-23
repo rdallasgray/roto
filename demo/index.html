@@ -2,7 +2,9 @@
 <html lang="en">
 	<head>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
-        <script type="text/javascript" src="jquery.roto.min.js"></script>
+<!--        <script type="text/javascript" src="jquery.roto.min.js"></script> //-->
+        <script type="text/javascript" src="../lib/bez/jquery.bez.min.js"></script>
+        <script type="text/javascript" src="../src/jquery.roto.js"></script>
 		<link rel="stylesheet" href="roto.css">
 	</head>
 	<body>
@@ -100,7 +102,7 @@
 	</body>
 	<script type="text/javascript">
 	$(window).load(function() {
-		$("#carousel").roto({ snap: false/*, startOffset: 300, endOffset: 300*/ });
+		$("#carousel").roto({ snap: false, startOffset: 300, endOffset: 300 });
 		$("#slideshow").roto();
 		$("#listbox").roto({ direction: "v" });
 		$("#vertical-multi").roto({ direction: "v" });
