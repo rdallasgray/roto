@@ -20,7 +20,7 @@
 				drift_bezier: [0, 0, 0.3, 1],
 				bounce_duration: 400,
 				bounce_bezier: [0, 0.5, 0.5, 1],
-				pull_divisor: 3,
+				pull_divisor: 1.7,
 				timer_interval: 50,
 				disable_transitions: false,
 				startOffset: 0,
@@ -344,8 +344,11 @@
 						move = drag;
 					}
 					else {
-						move = (allowedPull * allowedPull) - (pointerMove * pointerMove) + trackingOffset;
-						console.debug(move);
+						var f = function(x) {
+								return x - (x/options.pull_divisor);
+							};
+						
+						move = f(pointerMove, allowedPull) + trackingOffset;
 					}
 					ul.css(getAnimatedProp(move));
 				},
