@@ -307,6 +307,49 @@
 					else prevButton.attr("disabled", "disabled");
 				},
 				
+				// respond to a goto event
+				rotoGoto = function(data) {
+					var type = typeof data;
+					switch(type) {
+						case "number":
+						gotoNumber(data);
+						break;
+						case "object":
+						gotoElement(data);
+						break;
+						case "string":
+						gotoNext(data);
+						break;
+					}
+				},
+				
+				// goto a numbered element
+				gotoNumber = function(num) {
+					if (num < 0 || num >= listItems.length) return;
+					var el = $(listItems.get(num));
+					gotoElement(el);
+				},
+				
+				// goto an element
+				gotoElement = function(el) {
+					gotoOffset(-1 * el.position()[dimensions.offsetName] + options.startOffset);
+				},
+				
+				// goto an offset
+				gotoOffset = function(offset) {
+					doAnimation(ul, getAnimatedProp(offset), options.shift_duration, "shift", function() {
+						switchButtons();
+						running = false;
+					});
+				},
+				
+				// goto prev or next
+				gotoNext = function(dirStr) {
+					if (dirStr !== "prev" && dirStr !== "next") return;
+					dir = (dirStr === "prev") ? 1 : -1;
+					gotoElement(getNextListItemTo(getCurrentOffset(), dir));
+				},
+				
 				// shift the listItems one ul width in the given direction
 				rotoShift = function(dir) {
 					var move = 0;
@@ -333,7 +376,7 @@
 						move = Math.min(getSnapMove(getCurrentOffset() + containerMeasure - options.endOffset, dir, false), maxOffset);
 					}
 					// move the offsetElement to the start of the container
-					doShift(move);
+					gotoOffset(move);
 				},
 				
 				// track the ul to movement of the pointer
@@ -547,6 +590,8 @@
 			// check what state the buttons need to be in, and measure the listitems
 			remeasure();
 			switchButtons();
+			container.bind("rotoGoto", function(e, d) { rotoGoto(d); });
+			container.bind("rotoShift", function(e, d) { rotoShift(d); });
 		});
 	}
 })(jQuery);

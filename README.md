@@ -30,9 +30,26 @@ What else do I need to know?
 ----------------------------
 Roto works best if you call it using $(window).load() rather than $(document).ready(). This is because Webkit-based browsers don't know the dimensions of images at $(document).ready() time, and Roto relies on those dimensions. This can mean you see a 'Flash of Unstyled Content' as the script hasn't applied styles to the rotoed elements before the page begins to display, so you may want to style your rotoed elements with "visibility: hidden" until the window is loaded. Of course, if you're giving all your images explicit dimensions anyway, you can use $(document).ready().
 
-Roto also fires an event called 'rotoChange' when the position of the roto content is changed (and on completion of any animations). You can listen for this event on the rotoed container and use it, for example, to change other content in your page when the roto is moved. The event passes the listitem leftmost or topmost in the roto as data. So you could do something like:
+
+What about events?
+------------------
+Roto fires an event called 'rotoChange' when the position of the roto content is changed (and on completion of any animations). You can listen for this event on the rotoed container and use it, for example, to change other content in your page when the roto is moved. The event passes the listitem leftmost or topmost in the roto as data. So you could do something like:
 
 $("#roto").bind("rotoChange", function(event, listitem) { $(listitem).css("color", "red") });
+
+Roto also listens for the events "rotoGoto" and "rotoShift".
+
+You can pass one of three values as data to the "rotoGoto" event: a number, a jQuery-wrapped element, or a string. 
+
+The number should be an index into the set of listitems contained in the rotoed container (starting from zero);
+The jQuery-wrapped element should be one of the listitems in the container (e.g. $("#myli"));
+The string should be "next" or "prev".
+
+In each case, roto will zip to the given item -- in the latter case, to the next or previous item in the container.
+
+The "rotoShift" event takes one argument as data -- a number, 1 or -1. Passing -1 will advance the roto one container width; passing 1 will retreat one container width.
+
+You can use these events to programmatically move a roto around based on other events on your page.
 
 
 What options do I have, and what are the defaults?
