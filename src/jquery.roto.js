@@ -61,7 +61,7 @@
 				transform = {
 					transform: "transform", 
 					MozTransform: "-moz-transform", 
-					WebkitTransform: "-webkit-transform",
+					WebkitTransform: "-webkit-transform"
 				},
 				transition = {
 					transition: { prop: "transition", "event": "transitionend" },
