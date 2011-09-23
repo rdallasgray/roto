@@ -219,7 +219,7 @@
 				getNearestListItemTo = function(offset, dir) {
 					var pos = maxOffset, extent, bound,
 						lis = (dir > 0) ? listItems.get().reverse() : listItems,
-						li = listItems.get(0);
+						li = listItems.get(0), _el;
 					$.each(lis, function(idx, el) {
 						_el = $(el);
 						// set pos to the position of the current listItem
@@ -326,12 +326,10 @@
 
 					if (dir < 0) {
 						// if we're moving forwards, find the element nearest the end of the container
-						console.debug(getCurrentOffset(), containerMeasure, options.startOffset);
 						move = Math.max(getSnapMove(getCurrentOffset() - containerMeasure + options.startOffset, dir, false), minOffset);
 					}
 					else {
 						// if we're moving backwards, find the element one container width towards the start of the container
-						console.debug(getCurrentOffset(), containerMeasure, options.startOffset);
 						move = Math.min(getSnapMove(getCurrentOffset() + containerMeasure - options.endOffset, dir, false), maxOffset);
 					}
 					// move the offsetElement to the start of the container
@@ -341,18 +339,14 @@
 				// track the ul to movement of the pointer
 				rotoTrack = function(pointerMove) {
 					var drag = Math.ceil(pointerMove + trackingOffset),
-						allowedPull = containerMeasure/options.pull_divisor,
 						move;
 					// allow user to pull the ul beyond the max/min offsets
 					if (drag < (maxOffset) && drag > (minOffset)) {
 						move = drag;
 					}
 					else {
-						var f = function(x) {
-								return x - (x/options.pull_divisor);
-							};
-						
-						move = f(pointerMove, allowedPull) + trackingOffset;
+						var diff = (drag > maxOffset) ? drag - maxOffset : drag - minOffset,
+							move = drag - diff/options.pull_divisor;
 					}
 					ul.css(getAnimatedProp(move));
 				},
