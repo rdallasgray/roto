@@ -7,38 +7,38 @@
  * Copyright @YEAR Robert Dallas Gray. All rights reserved.
  * Provided under the FreeBSD license: https://github.com/rdallasgray/roto/blob/master/LICENSE.txt
 */
-(function($){
+(function($) {
 	$.fn.roto = function(options) {
 		var defaults = {
 				btnPrev: ".prev",
 				btnNext: ".next",
 				direction: "h",
 				shift_duration: 200,
-				shift_bezier: [0,0,0,1],
+				shift_bezier: [0, 0, 0, 1],
 				drift_duration: 1800,
 				drift_factor: 500,
-				drift_bezier: [0,0,0.3,1],
+				drift_bezier: [0, 0, 0.3, 1],
 				bounce_duration: 400,
-				bounce_bezier: [0,0.5,0.5,1],
+				bounce_bezier: [0, 0.5, 0.5, 1],
 				pull_divisor: 3,
 				timer_interval: 50,
 				disable_transitions: false,
 				startOffset: 0,
-				endOffset: 0, 
+				endOffset: 0,
 				snap: true
 			},
 			options = $.extend(defaults, options || {}),
 		
 			msToS = 1000,
 
-			isTouchDevice = function() {
+			isTouchDevice = (function() {
 			    try {
 			        document.createEvent("TouchEvent");
 			        return true;
 			    } catch (e) {
 			        return false;
 			    }
-			}(),
+			}()),
 				
 			// names of events are dependent on whether device uses touch events
 			scrollEvents = isTouchDevice ?
@@ -218,7 +218,6 @@
 				// find the list element nearest the given offset, and its position
 				getNearestListItemTo = function(offset, dir) {
 					var pos = maxOffset, extent, bound,
-						dir = (dir === 0) ? lastValidDir : dir,
 						lis = (dir > 0) ? listItems.get().reverse() : listItems,
 						li = listItems.get(0);
 					$.each(lis, function(idx, el) {
@@ -244,8 +243,7 @@
 				
 				// find the next (by direction) listitem to the given offset
 				getNextListItemTo = function(offset, dir) {
-					var dir = (dir === 0) ? lastValidDir : dir,
-						func = dir < 0 ? "next" : "prev",
+					var func = dir < 0 ? "next" : "prev",
 						curr = getNearestListItemTo(offset, dir)[0],
 						next = $(curr)[func](),
 						li = next.length > 0 ? next : $(curr);
@@ -254,6 +252,7 @@
 				
 				// get the position of the listitem nearest the given offset
 				getSnapMove = function(offset, dir, next) {
+					var dir = (dir === 0) ? lastValidDir : dir;
 					return next ? 
 						-1 * Math.ceil(getNextListItemTo(offset, dir).position()[dimensions.offsetName]) 
 						: getNearestListItemTo(offset, dir)[1];
@@ -337,11 +336,18 @@
 				
 				// track the ul to movement of the pointer
 				rotoTrack = function(pointerMove) {
-					var move = Math.ceil(pointerMove + trackingOffset);
+					var drag = Math.ceil(pointerMove + trackingOffset),
+						allowedPull = containerMeasure/options.pull_divisor,
+						move;
 					// allow user to pull the ul beyond the max/min offsets
-					if (move < (maxOffset + containerMeasure/options.pull_divisor) && move > (minOffset - containerMeasure/options.pull_divisor)) {
-						ul.css(getAnimatedProp(move));
+					if (drag < (maxOffset) && drag > (minOffset)) {
+						move = drag;
 					}
+					else {
+						move = (allowedPull * allowedPull) - (pointerMove * pointerMove) + trackingOffset;
+						console.debug(move);
+					}
+					ul.css(getAnimatedProp(move));
 				},
 				
 				// continue ul movement inertially based on pointer speed
