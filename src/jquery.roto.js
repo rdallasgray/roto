@@ -275,7 +275,23 @@
 				// remeasure the container and derive the minimum offset allowed
 				// the minimum offset is the total measure of the listItems - the measure of the ul
 				remeasure = function() {
-					containerMeasure = Math.ceil(ul.parent()[dimensions.measure.toLowerCase()]()),
+					// measure the total width or height of the elements contained in the ul
+					// if roto is horizontal, we have to individually measure each listItem
+					if (options.direction === 'h') {
+						// for each element, add the outer dimension of the element including margin and padding
+						listItems.each(function(idx, el) {
+							rotoMeasure += Math.ceil($(el)["outer"+dimensions.measure](true));
+						});
+						// set the dimension of the ul to what we measured, just to be sure
+						ul[dimensions.measure.toLowerCase()](rotoMeasure + (Math.ceil(rotoMeasure/100)));
+					}
+					else {
+						// if roto is vertical we can use a simpler method to calculate size:
+						// just find the position of the last element and add its outer dimension, including margin and padding
+						var last = listItems.last();
+						rotoMeasure = Math.round($(last).position()[dimensions.offsetName] + $(last)["outer"+dimensions.measure](true));
+					}
+					containerMeasure = Math.ceil(container[dimensions.measure.toLowerCase()]()),
 					minOffset = Math.ceil(rotoMeasure - containerMeasure + offsetCorrection + options.endOffset) * -1;
 					if (options.snap) {
 						minOffset = getSnapMove(minOffset, -1, false);
@@ -573,23 +589,6 @@
 				nextButton.click(function() {
 					return rotoShift(-1);
 				});
-			}
-
-			// measure the total width or height of the elements contained in the ul
-			// if roto is horizontal, we have to individually measure each listItem
-			if (options.direction === 'h') {
-				// for each element, add the outer dimension of the element including margin and padding
-				listItems.each(function(idx, el) {
-					rotoMeasure += Math.ceil($(el)["outer"+dimensions.measure](true));
-				});
-				// set the dimension of the ul to what we measured, just to be sure
-				ul[dimensions.measure.toLowerCase()](rotoMeasure + (Math.ceil(rotoMeasure/100)));
-			}
-			else {
-				// if roto is vertical we can use a simpler method to calculate size:
-				// just find the position of the last element and add its outer dimension, including margin and padding
-				var last = listItems.last();
-				rotoMeasure = Math.round($(last).position()[dimensions.offsetName] + $(last)["outer"+dimensions.measure](true));
 			}
 
 			// let's get started
