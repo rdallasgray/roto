@@ -277,6 +277,7 @@
 				remeasure = function() {
 					// measure the total width or height of the elements contained in the ul
 					// if roto is horizontal, we have to individually measure each listItem
+					rotoMeasure = 0;
 					if (options.direction === 'h') {
 						// for each element, add the outer dimension of the element including margin and padding
 						listItems.each(function(idx, el) {
@@ -296,6 +297,7 @@
 					if (options.snap) {
 						minOffset = getSnapMove(minOffset, -1, false);
 					}
+					console.debug(rotoMeasure, containerMeasure, minOffset);
 				},
 				
 				// check if prev & next buttons are being used
@@ -506,7 +508,6 @@
 
 			// remeasure everything on window resize, in case there are fluid elements involved
 			$(window).resize(function() {
-				containerMeasure = ul.parent()[dimensions.measure.toLowerCase()]();
 				boot();
 			});
 
