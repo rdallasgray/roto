@@ -426,7 +426,7 @@
 				},
 				
 				// timer to calculate speed of pointer movement
-				timer = function() {
+				timer = (function() {
 					var startCoOrd = 0, currentCoOrd = 0, initialCoOrd = 0,
 						chunker = null,
 						chunk = { startCoOrd: 0, endCoOrd: 0 };
@@ -458,7 +458,13 @@
 							currentCoOrd = coOrd;
 						}
 					}
-				}();
+				}()),
+				
+				// boot or reboot the roto
+				boot = function() {
+					remeasure();
+					switchButtons();
+				};
 
 			// prevent webkit flicker	
 			if (transitionProp === "-webkit-transition") ul.css("-webkit-backface-visibility", "hidden");
@@ -484,9 +490,8 @@
 
 			// remeasure everything on window resize, in case there are fluid elements involved
 			$(window).resize(function() {
-				containerMeasure = ul.parent()[dimensions.measure.toLowerCase()](),
-				remeasure();
-				switchButtons();
+				containerMeasure = ul.parent()[dimensions.measure.toLowerCase()]();
+				boot();
 			});
 
 			// bind scroll events
@@ -587,11 +592,12 @@
 				rotoMeasure = Math.round($(last).position()[dimensions.offsetName] + $(last)["outer"+dimensions.measure](true));
 			}
 
-			// check what state the buttons need to be in, and measure the listitems
-			remeasure();
-			switchButtons();
+			// let's get started
 			container.bind("rotoGoto", function(e, d) { rotoGoto(d); });
 			container.bind("rotoShift", function(e, d) { rotoShift(d); });
+			container.bind("rotoContentChange", function() { boot(); });
+			boot();
+			
 		});
 	}
 })(jQuery);
