@@ -297,7 +297,6 @@
 					if (options.snap) {
 						minOffset = getSnapMove(minOffset, -1, false);
 					}
-					console.debug(rotoMeasure, containerMeasure, minOffset);
 				},
 				
 				// check if prev & next buttons are being used
