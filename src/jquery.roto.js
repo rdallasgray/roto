@@ -64,7 +64,7 @@
             // set up transitions
             transitionStr = null,
             setTransitions = function(element) {
-                if (transitionProp !== null) {
+                if (usingTransitions()) {
                     var opt = {};
                     if (transitionStr === null) {
                         transitionStr = [transformProp, " ", options.shift_duration/msToS, "s ease 0s"].join("");
@@ -74,12 +74,16 @@
                 }
             },
             unsetTransitions = function(element) {
-                if (transitionProp !== null) {
+                if (usingTransitions()) {
                     var opt = {};
                     opt[transitionProp] = "none";
                     element.css(opt);
                 }
+            },
+            usingTransitions = function() {
+                return transitionProp !== null;
             };
+
             
         // get correct transition css properties and events, if supported
         if (!options.disable_transitions) {
@@ -204,15 +208,11 @@
                         element.stop();
                     }
                 },
-                // are we using css transitions?
-                usingTransitions = function() {
-                    return transitionProp !== null;
-                },
                 
                 // get the css property to animate based on whether transforms are supported
                 getAnimatedProp = function(move) {
                     var opt = {};
-                    if (transformProp !== null) {
+                    if (usingTransitions()) {
                         if (animatedProp === null) {
                             var use3d = isTouchDevice ? "3d" : "",
                                 translateStr = (use3d === "3d") ? "(Xpx,Ypx,0px)" : "(Xpx,Ypx)",
@@ -230,10 +230,8 @@
                 
                 // get the current offset position of the ul, dependent on whether transforms are supported
                 getCurrentOffset = function() {
-                    var cssPosition = ul.position()[dimensions.offsetName] - offsetCorrection;
-                    if (transformProp === null) {
-                        return cssPosition
-                    }
+                    if (!usingTransitions()) return ul.position()[dimensions.offsetName] - offsetCorrection;
+                    
                     var transformStr = ul.css(transformProp),
                         matches = transformStr.match(/\-?[0-9]+/g);
 
@@ -290,8 +288,8 @@
                 
                 // is the roto already snapped to a listitem?
                 isSnapped = function() {
-                    var cOffset = getCurrentOffset();
-                    return cOffset === getSnapMove(cOffset, 0, false);
+                    var offset = getCurrentOffset();
+                    return offset === getSnapMove(offset, lastValidDir, false);
                 },
                 
                 // trigger event on completion of move
@@ -519,11 +517,11 @@
             ul.css({ position: "relative", whiteSpace: "nowrap", padding: 0, margin: 0 });
             listItems.css({ display: "block", "float": "left", listStyle: "none" });
 
+            // move the ul to startOffset            
+            ul.css(getAnimatedProp(options.startOffset));
+
             // make IE7 sane
             offsetCorrection = Math.ceil(getCurrentOffset());
-
-            //    move the ul to startOffset            
-            ul.css(getAnimatedProp(options.startOffset));
 
             // if prev/next buttons don't seem to be inside the container, look for them outside
             if (prevButton.length === 0 && options.btnPrev === defaults.btnPrev) {
