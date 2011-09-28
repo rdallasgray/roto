@@ -30,6 +30,8 @@
             options = $.extend(defaults, options || {}),
         
             msToS = 1000,
+            
+            coOrdRef = "client",
 
             isTouchDevice = (function() {
                 try {
@@ -570,15 +572,15 @@
                     }
                 }
                 e = wrapScrollEvent(e);
-                var startCoOrd = e["screen"+dimensions.coOrd];
+                var startCoOrd = e[coOrdRef+dimensions.coOrd];
                 timer.setCurrentCoOrd(startCoOrd);
 
                 // scrolling has started, so begin tracking pointer movement and measuring speed
                 $(document).bind(scrollEvents.move + ".roto." + containerId, function(f) {
                     f.preventDefault();
                     f = wrapScrollEvent(f);
-                    timer.setCurrentCoOrd(f["screen"+dimensions.coOrd]);
-                    rotoTrack(f["screen"+dimensions.coOrd] - startCoOrd);
+                    timer.setCurrentCoOrd(f[coOrdRef+dimensions.coOrd]);
+                    rotoTrack(f[coOrdRef+dimensions.coOrd] - startCoOrd);
                 });
                 
                 // user stopped scrolling
