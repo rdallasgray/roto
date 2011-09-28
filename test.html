@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+        <script type="text/javascript" src="src/jquery.roto.js"></script>
+        <script type="text/javascript" src="lib/bez/jquery.bez.min.js"></script>
+		<link rel="stylesheet" href="demo/roto.css">
+	</head>
+	<body>
+		<h1>Roto demo</h1>
+		<h3>A flexible-width image carousel:</h3>
+		<div id="carousel" class="roto">
+			<ul>
+				<li id="c1"><img src="demo/test-images/roto-test-01.jpg"/></li>
+				<li id="c2"><img src="demo/test-images/roto-test-02.jpg"/></li>
+				<li id="c3"><img src="demo/test-images/roto-test-03.jpg"/></li>
+				<li id="c4"><img src="demo/test-images/roto-test-04.jpg"/></li>
+				<li id="c5"><img src="demo/test-images/roto-test-05.jpg"/></li>
+				<li id="c6"><img src="demo/test-images/roto-test-06.jpg"/></li>
+				<li id="c7"><img src="demo/test-images/roto-test-07.jpg"/></li>
+				<li id="c8"><img src="demo/test-images/roto-test-08.jpg"/></li>
+				<li id="c9"><img src="demo/test-images/roto-test-09.jpg"/></li>
+				<li id="c10"><img src="demo/test-images/roto-test-10.jpg"/></li>
+				<li id="c11"><img src="demo/test-images/roto-test-11.jpg"/></li>
+				<li id="c12"><img src="demo/test-images/roto-test-12.jpg"/></li>
+				<li id="c13"><img src="demo/test-images/roto-test-13.jpg"/></li>
+				<li id="c14"><img src="demo/test-images/roto-test-14.jpg"/></li>
+				<li id="c15"><img src="demo/test-images/roto-test-15.jpg"/></li>
+				<li id="c16"><img src="demo/test-images/roto-test-16.jpg"/></li>
+			</ul>
+			<button class="prev">Previous</button>
+			<button class="next">Next</button>
+		</div>
+
+		<h3>A slideshow:</h3>
+		<div id="slideshow" class="roto">
+			<ul>
+				<li id="s1" id="s1">Slide 1</li>
+				<li id="s2">Slide 2</li>
+				<li id="s3">Slide 3</li>
+				<li id="s4">Slide 4</li>
+				<li id="s5">Slide 5</li>
+				<li id="s6">Slide 6</li>
+			</ul>
+		</div>
+		<button id="slideshow-prev">Previous</button>
+		<button id="slideshow-next">Next</button>
+		
+		<h3>A listbox:</h3>
+		<div id="listbox" class="roto">
+			<ul>
+				<li id="l1" id="l1">List item 1</li>
+				<li id="l2">List item 2</li>
+				<li id="l3">List item 3</li>
+				<li id="l4">List item 4</li>
+				<li id="l5">List item 5</li>
+				<li id="l6">List item 6</li>
+				<li id="l7">List item 7</li>
+				<li id="l8">List item 8</li>
+				<li id="l9">List item 9</li>
+				<li id="l10">List item 10</li>
+				<li id="l11">List item 11</li>
+				<li id="l12">List item 12</li>
+				<li id="l13">List item 13</li>
+				<li id="l14">List item 14</li>
+				<li id="l15">List item 15</li>
+				<li id="l16">List item 16</li>
+				<li id="l17">List item 17</li>
+				<li id="l18">List item 18</li>
+				<li id="l19">List item 19</li>
+				<li id="l20">List item 20</li>
+			</ul>
+		</div>
+		<button id="listbox-prev">Previous</button>
+		<button id="listbox-next">Next</button>
+		
+		<h3>A vertical, multiple carousel with snapping:</h3>
+		<div id="vertical-multi" class="roto">
+			<ul>
+				<li><img src="demo/test-images/roto-test-01.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-02.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-03.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-04.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-05.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-06.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-07.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-08.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-09.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-10.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-11.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-12.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-13.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-14.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-15.jpg"/></li>
+				<li><img src="demo/test-images/roto-test-16.jpg"/></li>
+			</ul>
+		</div>
+		<button id="vertical-multi-prev">Previous</button>
+		<button id="vertical-multi-next">Next</button>
+
+	</body>
+	<script type="text/javascript">
+	$(window).load(function() {
+		$("#carousel").roto({ snap: false });
+		$("#slideshow").roto();
+		$("#listbox").roto({ direction: "v" });
+		$("#vertical-multi").roto({ direction: "v" });
+		$(".roto").css("visibility", "visible");
+	});
+	</script>
+</html>
