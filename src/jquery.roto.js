@@ -232,7 +232,7 @@
                 getNearestListItemTo = function(offset, dir) {
                     var pos = maxOffset, extent, bound,
                         lis = (dir > 0) ? listItems.get().reverse() : listItems,
-                        li = listItems.get(0), _el;
+                        li, _el, measure = "outer" + dimensions.measure;
                     $.each(lis, function(idx, el) {
                         _el = $(el);
                         // set pos to the position of the current listItem
@@ -240,12 +240,12 @@
                         li = el;
                         if (dir < 0) {
                             pos -= options.startOffset;
-                            extent = (-1 * pos) + _el["outer" + dimensions.measure](true);
+                            extent = (-1 * pos) + _el[measure](true);
                             bound = -1 * offset;
                         }
                         else {
                             pos += options.endOffset;
-                            extent = _el.prev().length > 0 ? pos + _el.prev()["outer" + dimensions.measure](true) : pos;
+                            extent = _el.prev().length > 0 ? pos + _el.prev()[measure](true) : pos;
                             bound = offset;
                         }
                         // if the position is beyond the offset, break the loop
@@ -299,7 +299,7 @@
                             rotoMeasure += Math.ceil($(el)["outer"+dimensions.measure](true));
                         });
                         // set the dimension of the ul to what we measured, just to be sure
-                        ul[dimensions.measure.toLowerCase()](rotoMeasure + (Math.ceil(rotoMeasure/100)));
+                        ul[dimensions.measure.toLowerCase()](rotoMeasure);
                     }
                     else {
                         // if roto is vertical we can use a simpler method to calculate size:
@@ -386,7 +386,7 @@
                 rotoShift = function(dir) {
                     var move = 0;
                     // do nothing if the animation is already running
-                    if (state !== states.ready) return;
+                    if (state === states.shifting) return;
                     state = states.shifting;
                     lastValidDir = dir;
 
