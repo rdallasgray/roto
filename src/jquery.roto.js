@@ -54,37 +54,19 @@
                 }
                 return e;
             },
-            transformProp = null, transitionProp = null, transitionEvent = null,
+
+            transformProp = null, transitionProp = null, transitionEvent = null, transitionStr = null,
+
+            usingTransitions = function() {
+                return transitionProp !== null;
+            },
             
             // names of dimensions are dependent on whether the roto is horizontal or vertical
             orientations = { 
                 h: { measure: "Width", offsetName: "left", coOrd: "X" },
                 v: { measure: "Height", offsetName: "top", coOrd: "Y" }
             },
-            dimensions = orientations[options.direction],
-            
-            // set up transitions
-            transitionStr = null,
-            setTransitions = function(element) {
-                if (usingTransitions()) {
-                    var opt = {};
-                    if (transitionStr === null) {
-                        transitionStr = [transformProp, " ", options.shift_duration/msToS, "s ease 0s"].join("");
-                    }
-                    opt[transitionProp] = transitionStr;
-                    element.css(opt);
-                }
-            },
-            unsetTransitions = function(element) {
-                if (usingTransitions()) {
-                    var opt = {};
-                    opt[transitionProp] = "none";
-                    element.css(opt);
-                }
-            },
-            usingTransitions = function() {
-                return transitionProp !== null;
-            };
+            dimensions = orientations[options.direction];
 
             
         // get correct transition css properties and events, if supported
@@ -139,8 +121,9 @@
                 animatedProp = null,
                 // look-up table for css transition properties
                 transitionLUT = null,
-                // whether animations are running
-                running = false,
+                // current state of the roto as regards animations etc.
+                states = { ready: "ready", tracking: "tracking", drifting: "drifting", shifting: "shifting", bouncing: "bouncing" },
+                state = states.ready,
                 // whether the rotoChange event has already been primed
                 changeEventPrimed = false,
                 // cache of the previous and next button elements
@@ -161,21 +144,14 @@
                         changeEventPrimed = true;
                     }
                     if (usingTransitions()) {
-                        // build the transition LUT if necessary
-                        if (transitionLUT === null) {
-                            transitionLUT = {
-                                durationProp: transitionProp + "-duration",
-                                timingFunctionProp: transitionProp + "-timing-function",
-                                timingFunction: {}
-                            };
-                        }
-                        if (transitionLUT.timingFunction[easing] === undefined) {
-                            transitionLUT.timingFunction[easing] = ["cubic-bezier(", options[easing + "_bezier"].join(","), ")"].join("");
+                        LUT = getTransitionLUT();
+                        if (LUT.timingFunction[easing] === undefined) {
+                            LUT.timingFunction[easing] = ["cubic-bezier(", options[easing + "_bezier"].join(","), ")"].join("");
                         }
                         // construct a simple object to set as CSS props
                         var opt = {};
-                        opt[transitionLUT.durationProp] = duration/msToS + "s";
-                        opt[transitionLUT.timingFunctionProp] = transitionLUT.timingFunction[easing];
+                        opt[LUT.durationProp] = duration/msToS + "s";
+                        opt[LUT.timingFunctionProp] = transitionLUT.timingFunction[easing];
                         element.css(opt);
                         
                         // store the callback as data to use in case animation is stopped
@@ -197,18 +173,29 @@
                 stopAnimation = function(element) {
                     if (usingTransitions()) {
                         var offset = getCurrentOffset();
-                        unsetTransitions(ul);
+                        element.unbind(transitionEvent);
+                        element.css(getAnimatedProp(offset));
                         // run the callback stored in the element's data, then remove it
                         if (typeof element.data("animationCallback") === "function") {
                             element.data("animationCallback")();
                             element.data("animationCallback", null);
                         }
-                        element.css(getAnimatedProp(offset));
                     }
                     else {
                         // using jQuery.animate, so stop() will work fine
                         element.stop();
                     }
+                },
+                getTransitionLUT = function() {
+                    // build the transition LUT if necessary
+                    if (transitionLUT === null) {
+                        transitionLUT = {
+                            durationProp: transitionProp + "-duration",
+                            timingFunctionProp: transitionProp + "-timing-function",
+                            timingFunction: {}
+                        };
+                    }
+                    return transitionLUT;
                 },
                 
                 // get the css property to animate based on whether transforms are supported
@@ -384,7 +371,7 @@
                 gotoOffset = function(offset) {
                     doAnimation(ul, getAnimatedProp(offset), options.shift_duration, "shift", function() {
                         switchButtons();
-                        running = false;
+                        state = states.ready;
                     });
                 },
                 
@@ -399,16 +386,15 @@
                 rotoShift = function(dir) {
                     var move = 0;
                     // do nothing if the animation is already running
-                    if (running) return;
-                    running = true;
-                    setTransitions(ul);
+                    if (state !== states.ready) return;
+                    state = states.shifting;
                     lastValidDir = dir;
 
                     // internal function to move the listitems by the calculated amount
                     var doShift = function(move) {
                         doAnimation(ul, getAnimatedProp(move), options.shift_duration, "shift", function() {
                             switchButtons();
-                            running = false;
+                            state = states.ready;
                         });
                     };
 
@@ -436,6 +422,13 @@
                         var diff = (drag > maxOffset) ? drag - maxOffset : drag - minOffset,
                             move = drag - diff/options.pull_divisor;
                     }
+                    if (state !== states.tracking) {
+                        var opt = {}, LUT = getTransitionLUT();
+                        opt[LUT.durationProp] = "0s";
+                        opt[LUT.timingFunctionProp] = "none";
+                        ul.css(opt);
+                    }
+                    state = states.tracking;
                     ul.css(getAnimatedProp(move));
                 },
                 
@@ -457,7 +450,9 @@
                         notifyChanged();
                         return;
                     }
+                    state = states.drifting;
                     doAnimation(ul, getAnimatedProp(move), options.drift_duration, "drift", function() {
+                        state = states.ready;
                         switchButtons();
                     });
                 },
@@ -465,7 +460,9 @@
                 // bounce the ul elastically after it's pulled beyond max or min offsets
                 bounceBack = function(dir) {
                     var end = (dir < 0) ? minOffset : maxOffset;
+                    state = states.bouncing;
                     doAnimation(ul, getAnimatedProp(end), options.bounce_duration, "bounce", function() {
+                        state = states.ready;
                         switchButtons();
                     });
                 },
@@ -539,7 +536,7 @@
 
             // bind scroll events
             ul.bind(scrollEvents.start + ".roto." + containerId, function(e) {
-                running = false;
+                state = states.ready;
                 trackingOffset = getCurrentOffset();
                 stopAnimation(ul);
                 var linkElements = ul.find("a"),
@@ -585,7 +582,6 @@
                 // user stopped scrolling
                 $(document).one(scrollEvents.end, function() {
                     timer.stop();
-                    setTransitions(ul);
                     if (getCurrentOffset() > maxOffset || getCurrentOffset() < minOffset) {
                         bounceBack(getCurrentOffset() - maxOffset);
                     }
