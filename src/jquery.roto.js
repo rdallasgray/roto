@@ -194,7 +194,7 @@
                         element.animate(css, duration, $.bez(options[easing + "_bezier"]), _callback);
                     }
                 },
-                stopAnimation = function(element, offset) {
+                stopAnimation = function(element) {
                     if (usingTransitions()) {
                         var offset = getCurrentOffset();
                         unsetTransitions(ul);
@@ -237,8 +237,6 @@
                     var transformStr = ul.css(transformProp),
                         matches = transformStr.match(/\-?[0-9]+/g);
 
-                    if (matches === null) return cssPosition;
-                
                     var val = (dimensions.coOrd === 'X') ? matches[4] : matches[5];
                     return parseInt(val);
                 },
@@ -306,6 +304,8 @@
                     // measure the total width or height of the elements contained in the ul
                     // if roto is horizontal, we have to individually measure each listItem
                     rotoMeasure = 0;
+                    listItems = ul.find("li");
+                    listItems.css({ display: "block", "float": "left", listStyle: "none" });
                     if (options.direction === 'h') {
                         // for each element, add the outer dimension of the element including margin and padding
                         listItems.each(function(idx, el) {
@@ -517,7 +517,6 @@
             // set required styles
             container.css({ overflow: "hidden", position: "relative" });
             ul.css({ position: "relative", whiteSpace: "nowrap", padding: 0, margin: 0 });
-            listItems.css({ display: "block", "float": "left", listStyle: "none" });
 
             // move the ul to startOffset            
             ul.css(getAnimatedProp(options.startOffset));
@@ -542,7 +541,7 @@
             ul.bind(scrollEvents.start + ".roto." + containerId, function(e) {
                 running = false;
                 trackingOffset = getCurrentOffset();
-                stopAnimation(ul, trackingOffset);
+                stopAnimation(ul);
                 var linkElements = ul.find("a"),
                     oldLinkEvents = {};
 
