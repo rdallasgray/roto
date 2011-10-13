@@ -513,7 +513,7 @@
 
             // set required styles
             container.css({ overflow: "hidden", position: "relative" });
-            ul.css({ position: "relative", whiteSpace: "nowrap", padding: 0, margin: 0 });
+            ul.css({ position: "relative", padding: 0, margin: 0 });
 
             // move the ul to startOffset            
             ul.css(getAnimatedProp(options.startOffset));
