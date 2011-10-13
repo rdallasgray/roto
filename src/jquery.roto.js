@@ -518,9 +518,6 @@
             // move the ul to startOffset            
             ul.css(getAnimatedProp(options.startOffset));
 
-            // make IE7 sane
-            offsetCorrection = Math.ceil(getCurrentOffset());
-
             // if prev/next buttons don't seem to be inside the container, look for them outside
             if (prevButton.length === 0 && options.btnPrev === defaults.btnPrev) {
                 if (container.attr("id")) {
@@ -619,7 +616,10 @@
             container.bind("rotoShift", function(e, d) { rotoShift(d); });
             container.bind("rotoContentChange", function() { boot(); });
             boot();
-            
+
+            // make IE7 sane
+            offsetCorrection = Math.ceil(getCurrentOffset());
+            if (offsetCorrection !== 0) remeasure();
         });
     }
 })(jQuery);
