@@ -100,7 +100,7 @@
             var // the element containing the buttons and ul
                 container = $(this),
                 // the ul containing the elements to be rotoed, and a cache of its li subelements
-                ul = container.find("ul").first(), listItems = ul.find("li"),
+                ul = container.find("ul").first(), listItems = container.find("ul > li"),
                 // the offset measured before the ul is moved (to prevent problems in IE7)
                 offsetCorrection = 0,
                 // the maximum offset from starting position that the roto can be moved
