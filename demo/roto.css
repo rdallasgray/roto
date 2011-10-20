@@ -13,7 +13,7 @@ h3 {
 	border: solid black 1px;
 }
 
-#slideshow span {
+#slideshow li {
 	width: 390px;
 	height: 290px;
 	border: solid white 5px;
@@ -44,7 +44,7 @@ h3 {
 	height: 450px;
 }
 
-#vertical-multi span {
+#vertical-multi li {
 	width: 150px;
 	height: 150px;
 	text-align: center;

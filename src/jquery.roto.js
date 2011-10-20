@@ -10,6 +10,7 @@
 (function($) {
     $.fn.roto = function(options) {
         var defaults = {
+                compat: false,
                 btnPrev: ".prev",
                 btnNext: ".next",
                 direction: "h",
