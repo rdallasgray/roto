@@ -56,10 +56,6 @@
             },
 
             transformProp = null, transitionProp = null, transitionEvent = null, transitionStr = null,
-
-            usingTransitions = function() {
-                return transitionProp !== null;
-            },
             
             // names of dimensions are dependent on whether the roto is horizontal or vertical
             orientations = { 
@@ -95,6 +91,8 @@
                 }
             }
         }
+        
+        var usingTransitions = transitionProp !== null;
         
         return this.each(function() {
             var // the element containing the buttons and ul
@@ -136,15 +134,15 @@
                     var _callback = callback;
                     // don't add a change notification to the callback if one has already been added --
                     // unless we're not using css transitions, in which case do
-                    if (!changeEventPrimed || !usingTransitions()) {
+                    if (!changeEventPrimed || !usingTransitions) {
                         _callback = function() {
                             notifyChanged();
                             callback();
                         }
                         changeEventPrimed = true;
                     }
-                    if (usingTransitions()) {
-                        LUT = getTransitionLUT();
+                    if (usingTransitions) {
+                        var LUT = getTransitionLUT();
                         if (LUT.timingFunction[easing] === undefined) {
                             LUT.timingFunction[easing] = ["cubic-bezier(", options[easing + "_bezier"].join(","), ")"].join("");
                         }
@@ -171,7 +169,7 @@
                     }
                 },
                 stopAnimation = function(element) {
-                    if (usingTransitions()) {
+                    if (usingTransitions) {
                         var offset = getCurrentOffset();
                         element.unbind(transitionEvent);
                         element.css(getAnimatedProp(offset));
@@ -201,7 +199,7 @@
                 // get the css property to animate based on whether transforms are supported
                 getAnimatedProp = function(move) {
                     var opt = {};
-                    if (usingTransitions()) {
+                    if (usingTransitions) {
                         if (animatedProp === null) {
                             var use3d = isTouchDevice ? "3d" : "",
                                 translateStr = (use3d === "3d") ? "(Xpx,Ypx,0px)" : "(Xpx,Ypx)",
@@ -219,7 +217,7 @@
                 
                 // get the current offset position of the ul, dependent on whether transforms are supported
                 getCurrentOffset = function() {
-                    if (!usingTransitions()) return ul.position()[dimensions.offsetName] - offsetCorrection;
+                    if (!usingTransitions) return ul.position()[dimensions.offsetName] - offsetCorrection;
                     
                     var transformStr = ul.css(transformProp),
                         matches = transformStr.match(/\-?[0-9]+/g);
@@ -259,10 +257,12 @@
                 // find the next (by direction) listitem to the given offset
                 getNextListItemTo = function(offset, dir) {
                     var func = dir < 0 ? "next" : "prev",
-                        curr = getNearestListItemTo(offset, dir)[0],
-                        next = $(curr)[func](),
-                        li = next.length > 0 ? next : $(curr);
-                    return li;
+                        curr = $(getNearestListItemTo(offset, dir)[0]),
+                        next = curr;
+                    do {
+                        next = next[func]();
+                    } while(next.length > 0 && next.position()[dimensions.offsetName] === curr.position()[dimensions.offsetName])
+                    return next;
                 },
                 
                 // get the position of the listitem nearest the given offset
@@ -439,7 +439,7 @@
                     var speed_dir = timer.getPointerSpeed(),
                         speed = speed_dir[0], dir = speed_dir[1],
                         cOffset = getCurrentOffset();
-                        
+
                     // distance to rotoDrift
                     var distance = speed * options.drift_factor * dir, 
                         move = distance + cOffset;
