@@ -97,9 +97,9 @@
         return this.each(function() {
             var // the element containing the buttons and ul
                 container = $(this),
-                // the ul containing the elements to be rotoed, and a cache of its li subelements
-                ul = container.children().first(), listItems = ul.children(),
-                // the offset measured before the ul is moved (to prevent problems in IE7)
+                // the element containing the elements to be rotoed, and a cache of its child elements
+                rotoFrame = container.children().first(), rotoKids = rotoFrame.children(),
+                // the offset measured before the rotoFrame is moved (to prevent problems in IE7)
                 offsetCorrection = 0,
                 // the maximum offset from starting position that the roto can be moved
                 maxOffset = options.startOffset,
@@ -111,7 +111,7 @@
                 lastValidDir = -1,
                 // the inner width or height of the container element
                 containerMeasure = 0,
-                // the total width or height of the contents of the ul element
+                // the total width or height of the contents of the rotoFrame element
                 rotoMeasure = 0,
                 // unique identification of the overall container, to be used in namespacing events
                 containerId = (typeof container.attr("id") !== undefined) ? container.attr("id") : "roto" + new Date().getTime(),
@@ -215,25 +215,25 @@
                     return opt;
                 },
                 
-                // get the current offset position of the ul, dependent on whether transforms are supported
+                // get the current offset position of the rotoFrame, dependent on whether transforms are supported
                 getCurrentOffset = function() {
-                    if (!usingTransitions) return ul.position()[dimensions.offsetName] - offsetCorrection;
+                    if (!usingTransitions) return rotoFrame.position()[dimensions.offsetName] - offsetCorrection;
                     
-                    var transformStr = ul.css(transformProp),
+                    var transformStr = rotoFrame.css(transformProp),
                         matches = transformStr.match(/\-?[0-9]+/g);
 
                     var val = (dimensions.coOrd === 'X') ? matches[4] : matches[5];
                     return parseInt(val);
                 },
                 
-                // find the list element nearest the given offset, and its position
-                getNearestListItemTo = function(offset, dir) {
+                // find the rotoKid nearest the given offset, and its position
+                getNearestRotoKidTo = function(offset, dir) {
                     var pos = maxOffset, extent, bound,
-                        lis = (dir > 0) ? listItems.get().reverse() : listItems,
+                        lis = (dir > 0) ? rotoKids.get().reverse() : rotoKids,
                         li, _el, measure = "outer" + dimensions.measure;
                     $.each(lis, function(idx, el) {
                         _el = $(el);
-                        // set pos to the position of the current listItem
+                        // set pos to the position of the current rotoKid
                         pos = -1 * Math.ceil(_el.position()[dimensions.offsetName]);
                         li = el;
                         if (dir < 0) {
@@ -254,10 +254,10 @@
                     return [li, pos];
                 },
                 
-                // find the next (by direction) listitem to the given offset
-                getNextListItemTo = function(offset, dir) {
+                // find the next (by direction) rotoKid to the given offset
+                getNextRotoKidTo = function(offset, dir) {
                     var func = dir < 0 ? "next" : "prev",
-                        curr = $(getNearestListItemTo(offset, dir)[0]),
+                        curr = $(getNearestRotoKidTo(offset, dir)[0]),
                         next = curr;
                     do {
                         next = next[func]();
@@ -265,15 +265,15 @@
                     return next;
                 },
                 
-                // get the position of the listitem nearest the given offset
+                // get the position of the rotoKid nearest the given offset
                 getSnapMove = function(offset, dir, next) {
                     var dir = (dir === 0) ? lastValidDir : dir;
                     return next ? 
-                        -1 * Math.ceil(getNextListItemTo(offset, dir).position()[dimensions.offsetName]) 
-                        : getNearestListItemTo(offset, dir)[1];
+                        -1 * Math.ceil(getNextRotoKidTo(offset, dir).position()[dimensions.offsetName]) 
+                        : getNearestRotoKidTo(offset, dir)[1];
                 },
                 
-                // is the roto already snapped to a listitem?
+                // is the roto already snapped to a rotoKid?
                 isSnapped = function() {
                     var offset = getCurrentOffset();
                     return offset === getSnapMove(offset, lastValidDir, false);
@@ -281,30 +281,30 @@
                 
                 // trigger event on completion of move
                 notifyChanged = function() {
-                    container.trigger("rotoChange", [getNearestListItemTo(getCurrentOffset(), 1)[0]]);
+                    container.trigger("rotoChange", [getNearestRotoKidTo(getCurrentOffset(), 1)[0]]);
                     changeEventPrimed = false;
                 },
                 
                 // remeasure the container and derive the minimum offset allowed
-                // the minimum offset is the total measure of the listItems - the measure of the ul
+                // the minimum offset is the total measure of the rotoKids - the measure of the rotoFrame
                 remeasure = function() {
-                    // measure the total width or height of the elements contained in the ul
-                    // if roto is horizontal, we have to individually measure each listItem
+                    // measure the total width or height of the elements contained in the rotoFrame
+                    // if roto is horizontal, we have to individually measure each rotoKid
                     rotoMeasure = 0;
-                    listItems = ul.children();
-                    listItems.css({ display: "block", "float": "left" });
+                    rotoKids = rotoFrame.children();
+                    rotoKids.css({ display: "block", "float": "left" });
                     if (options.direction === 'h') {
                         // for each element, add the outer dimension of the element including margin and padding
-                        listItems.each(function(idx, el) {
+                        rotoKids.each(function(idx, el) {
                             rotoMeasure += Math.ceil($(el)["outer"+dimensions.measure](true));
                         });
-                        // set the dimension of the ul to what we measured, just to be sure
-                        ul[dimensions.measure.toLowerCase()](rotoMeasure);
+                        // set the dimension of the rotoFrame to what we measured, just to be sure
+                        rotoFrame[dimensions.measure.toLowerCase()](rotoMeasure);
                     }
                     else {
                         // if roto is vertical we can use a simpler method to calculate size:
                         // just find the position of the last element and add its outer dimension, including margin and padding
-                        var last = listItems.last();
+                        var last = rotoKids.last();
                         rotoMeasure = Math.round($(last).position()[dimensions.offsetName] + $(last)["outer"+dimensions.measure](true));
                     }
                     containerMeasure = Math.ceil(container[dimensions.measure.toLowerCase()]()),
@@ -328,13 +328,13 @@
                 // enable or disable the previous and next buttons based on roto conditions
                 switchButtons = function() {
                     if (!usingButtons()) return;
-                    // if the total measure of the listItems extends beyond the end of the ul, enable the next button
+                    // if the total measure of the rotoKids extends beyond the end of the rotoFrame, enable the next button
                     if (rotoMeasure > (containerMeasure - getCurrentOffset())) {
                         nextButton.removeAttr("disabled");
                     }
                     else nextButton.attr("disabled", "disabled");
 
-                    // if the listItems are offset beyond the start of the ul, enable the previous button
+                    // if the rotoKids are offset beyond the start of the rotoFrame, enable the previous button
                     if (getCurrentOffset() < maxOffset) {
                         prevButton.removeAttr("disabled");
                     }
@@ -359,8 +359,8 @@
                 
                 // goto a numbered element
                 gotoNumber = function(num) {
-                    if (num < 0 || num >= listItems.length) return;
-                    var el = $(listItems.get(num));
+                    if (num < 0 || num >= rotoKids.length) return;
+                    var el = $(rotoKids.get(num));
                     gotoElement(el);
                 },
                 
@@ -371,7 +371,7 @@
                 
                 // goto an offset
                 gotoOffset = function(offset) {
-                    doAnimation(ul, getAnimatedProp(offset), options.shift_duration, "shift", function() {
+                    doAnimation(rotoFrame, getAnimatedProp(offset), options.shift_duration, "shift", function() {
                         switchButtons();
                         state = states.ready;
                     });
@@ -381,10 +381,10 @@
                 gotoNext = function(dirStr) {
                     if (dirStr !== "prev" && dirStr !== "next") return;
                     dir = (dirStr === "prev") ? 1 : -1;
-                    gotoElement(getNextListItemTo(getCurrentOffset(), dir));
+                    gotoElement(getNextRotoKidTo(getCurrentOffset(), dir));
                 },
                 
-                // shift the listItems one ul width in the given direction
+                // shift the rotoKids one rotoFrame width in the given direction
                 rotoShift = function(dir) {
                     var move = 0;
                     // do nothing if the animation is already running
@@ -392,9 +392,9 @@
                     state = states.shifting;
                     lastValidDir = dir;
 
-                    // internal function to move the listitems by the calculated amount
+                    // internal function to move the rotoFrame by the calculated amount
                     var doShift = function(move) {
-                        doAnimation(ul, getAnimatedProp(move), options.shift_duration, "shift", function() {
+                        doAnimation(rotoFrame, getAnimatedProp(move), options.shift_duration, "shift", function() {
                             switchButtons();
                             state = states.ready;
                         });
@@ -412,11 +412,11 @@
                     gotoOffset(move);
                 },
                 
-                // track the ul to movement of the pointer
+                // track the rotoFrame to movement of the pointer
                 rotoTrack = function(pointerMove) {
                     var drag = Math.ceil(pointerMove + trackingOffset),
                         move;
-                    // allow user to pull the ul beyond the max/min offsets
+                    // allow user to pull the rotoFrame beyond the max/min offsets
                     if (drag < (maxOffset) && drag > (minOffset)) {
                         move = drag;
                     }
@@ -428,13 +428,13 @@
                         var opt = {}, LUT = getTransitionLUT();
                         opt[LUT.durationProp] = "0s";
                         opt[LUT.timingFunctionProp] = "none";
-                        ul.css(opt);
+                        rotoFrame.css(opt);
                     }
                     state = states.tracking;
-                    ul.css(getAnimatedProp(move));
+                    rotoFrame.css(getAnimatedProp(move));
                 },
                 
-                // continue ul movement inertially based on pointer speed
+                // continue rotoFrame movement inertially based on pointer speed
                 rotoDrift = function() {
                     var speed_dir = timer.getPointerSpeed(),
                         speed = speed_dir[0], dir = speed_dir[1],
@@ -453,17 +453,17 @@
                         return;
                     }
                     state = states.drifting;
-                    doAnimation(ul, getAnimatedProp(move), options.drift_duration, "drift", function() {
+                    doAnimation(rotoFrame, getAnimatedProp(move), options.drift_duration, "drift", function() {
                         state = states.ready;
                         switchButtons();
                     });
                 },
                 
-                // bounce the ul elastically after it's pulled beyond max or min offsets
+                // bounce the rotoFrame elastically after it's pulled beyond max or min offsets
                 bounceBack = function(dir) {
                     var end = (dir < 0) ? minOffset : maxOffset;
                     state = states.bouncing;
-                    doAnimation(ul, getAnimatedProp(end), options.bounce_duration, "bounce", function() {
+                    doAnimation(rotoFrame, getAnimatedProp(end), options.bounce_duration, "bounce", function() {
                         state = states.ready;
                         switchButtons();
                     });
@@ -511,14 +511,14 @@
                 };
 
             // prevent webkit flicker    
-            if (transitionProp === "-webkit-transition") ul.css("-webkit-backface-visibility", "hidden");
+            if (transitionProp === "-webkit-transition") rotoFrame.css("-webkit-backface-visibility", "hidden");
 
             // set required styles
             container.css({ display: "block", overflow: "hidden", position: "relative" });
-            ul.css({ position: "relative", padding: 0, margin: 0 });
+            rotoFrame.css({ position: "relative", padding: 0, margin: 0 });
 
-            // move the ul to startOffset            
-            ul.css(getAnimatedProp(options.startOffset));
+            // move the rotoFrame to startOffset            
+            rotoFrame.css(getAnimatedProp(options.startOffset));
 
             // if prev/next buttons don't seem to be inside the container, look for them outside
             if (prevButton.length === 0 && options.btnPrev === defaults.btnPrev) {
@@ -534,21 +534,21 @@
             });
 
             // bind scroll events
-            ul.bind(scrollEvents.start + ".roto." + containerId, function(e) {
+            rotoFrame.bind(scrollEvents.start + ".roto." + containerId, function(e) {
                 state = states.ready;
                 trackingOffset = getCurrentOffset();
-                stopAnimation(ul);
-                var linkElements = ul.find("a"),
+                stopAnimation(rotoFrame);
+                var linkElements = rotoFrame.find("a"),
                     oldLinkEvents = {};
 
                 if (!isTouchDevice) {
                     e.preventDefault(); // prevent drag behaviour
                     if (document.ondragstart !== undefined) {
-                        ul.find("a, img").one("dragstart", function(f) { f.preventDefault(); });
+                        rotoFrame.find("a, img").one("dragstart", function(f) { f.preventDefault(); });
                     }
                     if (linkElements.length > 0) {
                         $(document).one(scrollEvents.move + ".roto." + containerId, function(f) {
-                            // intially prevent link elements responding to clicks at start of ul tracking
+                            // intially prevent link elements responding to clicks at start of rotoFrame tracking
                             linkElements.one("click.roto." + containerId, function(f) { f.preventDefault(); });
                             // gather any events attached to linkElements before unbinding
                             $.each(linkElements.data('events'), function(eventName, events) {
@@ -557,9 +557,9 @@
                                     oldLinkEvents[eventName].push(event);
                                 });
                             });
-                            // prevent linkElements responding to other events during ul tracking
+                            // prevent linkElements responding to other events during rotoFrame tracking
                             linkElements.unbind();
-                            // prevent linkElements responding to clicks during ul tracking
+                            // prevent linkElements responding to clicks during rotoFrame tracking
                             linkElements.bind("click.roto." + containerId, function(g) {
                                 g.preventDefault();
                             });
