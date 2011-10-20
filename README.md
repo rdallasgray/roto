@@ -13,8 +13,8 @@ Roto comes with a minimum of styling, so that you can make it look and behave ho
 How do I use it?
 ----------------
 1. Create a div or other block-level element. Give it an id or a classname that you can use to identify it.
-2. Put an unordered list inside it.
-3. Put some listitems in your list, containing whatever you want to be rotoed (normally images, or images inside links, but whatever you like).
+2. Put another element inside it.
+3. Put some more elements inside that one, containing whatever you want to be rotoed (normally images, or images inside links, but whatever you like).
 4. Optionally, add a couple of buttons with classnames 'prev' and 'next' inside the containing element.
 5. Call roto on the containing element, e.g. $("#roto-div").roto().
 
@@ -33,16 +33,16 @@ Roto works best if you call it using $(window).load() rather than $(document).re
 
 What about events?
 ------------------
-Roto fires an event called "rotoChange" when the position of the roto content is changed (and on completion of any animations). You can listen for this event on the rotoed container and use it, for example, to change other content in your page when the roto is moved. The event passes the listitem leftmost or topmost in the roto as data. So you could do something like:
+Roto fires an event called "rotoChange" when the position of the roto content is changed (and on completion of any animations). You can listen for this event on the rotoed container and use it, for example, to change other content in your page when the roto is moved. The event passes the element leftmost or topmost in the roto as data. So you could do something like:
 
-$("#roto").bind("rotoChange", function(event, listitem) { $(listitem).css("color", "red") });
+$("#roto").bind("rotoChange", function(event, element) { $(element).css("color", "red") });
 
 Roto also listens for the events "rotoGoto", "rotoShift" and "rotoContentChange".
 
 You can pass one of three values as data to the "rotoGoto" event: a number, a jQuery-wrapped element, or a string. 
 
-The number should be an index into the set of listitems contained in the rotoed container (starting from zero);
-The jQuery-wrapped element should be one of the listitems in the container (e.g. $("#myli"));
+The number should be an index into the set of elements contained in the rotoed container (starting from zero);
+The jQuery-wrapped element should be one of the elements in the container (e.g. $("#myelement"));
 The string should be "next" or "prev".
 
 In each case, roto will zip to the given item -- in the latter case, to the next or previous item in the container.
@@ -61,7 +61,7 @@ Lots of options. The ones you'll generally want to use are:
 - btnPrev: the css selector for the 'Previous' button. Default is '.prev'.
 - btnNext: the css selector for the 'Next' button. Default is '.next'.
 - direction: 'h' for horizontal, 'v' for vertical. Default is 'h'.
-- snap: whether to snap to individual listitems. Default is true.
+- snap: whether to snap to individual elements. Default is true.
 
 That's all. Power users have more options and should read the source and experiment.
 
@@ -74,9 +74,9 @@ Any way you like. I haven't supplied any examples, for reasons you can read abov
 
 There are certain things that will break Roto, though:
 
-1. The overall container must be set with overflow: hidden, position: relative.
-2. The unordered list must be set with position: relative, white-space: nowrap, and padding and margin 0.
-3. The listitems must be set with display: block, float: left, list-style: none.
+1. The outer container must be set with overflow: hidden, position: relative.
+2. The inner container must be set with position: relative, and padding and margin 0.
+3. The elements must be set with display: block, float: left.
 
 You DON'T need to set these -- the script does it for you. But be aware that if you contradict them in your own stylesheets or scripts, you could run into problems.
 
