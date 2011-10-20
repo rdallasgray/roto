@@ -310,7 +310,9 @@
                     containerMeasure = Math.ceil(container[dimensions.measure.toLowerCase()]()),
                     minOffset = Math.ceil(rotoMeasure - containerMeasure + offsetCorrection + options.endOffset) * -1;
                     if (options.snap) {
-                        minOffset = getSnapMove(minOffset, -1, false);
+                        var offset = getSnapMove(minOffset, -1, false);
+                        // check if the offset we got is less than the non-snap minOffset; if so, use the offset of the next listelement
+                        minOffset = offset > minOffset ? getSnapMove(minOffset, -1, true) : offset;
                     }
                 },
                 
