@@ -13,7 +13,7 @@ h3 {
 	border: solid black 1px;
 }
 
-#slideshow li {
+#slideshow span {
 	width: 390px;
 	height: 290px;
 	border: solid white 5px;
@@ -30,7 +30,7 @@ h3 {
 	background-color: rgb(240,240,240);
 }
 
-#listbox li {
+#listbox span {
 	width: 318px;
 	height: 48px;
 	border: solid rgb(240,240,240) 1px;
@@ -44,13 +44,13 @@ h3 {
 	height: 450px;
 }
 
-#vertical-multi ul li {
+#vertical-multi span {
 	width: 150px;
 	height: 150px;
 	text-align: center;
 	overflow: hidden;
 }
 
-#vertical-multi ul li img {
+#vertical-multi img {
 	display: inline;
 }

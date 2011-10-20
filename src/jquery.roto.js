@@ -98,7 +98,7 @@
             var // the element containing the buttons and ul
                 container = $(this),
                 // the ul containing the elements to be rotoed, and a cache of its li subelements
-                ul = container.find("ul").first(), listItems = ul.children("li"),
+                ul = container.children().first(), listItems = ul.children(),
                 // the offset measured before the ul is moved (to prevent problems in IE7)
                 offsetCorrection = 0,
                 // the maximum offset from starting position that the roto can be moved
@@ -291,8 +291,8 @@
                     // measure the total width or height of the elements contained in the ul
                     // if roto is horizontal, we have to individually measure each listItem
                     rotoMeasure = 0;
-                    listItems = ul.children("li");
-                    listItems.css({ display: "block", "float": "left", listStyle: "none" });
+                    listItems = ul.children();
+                    listItems.css({ display: "block", "float": "left" });
                     if (options.direction === 'h') {
                         // for each element, add the outer dimension of the element including margin and padding
                         listItems.each(function(idx, el) {
@@ -514,7 +514,7 @@
             if (transitionProp === "-webkit-transition") ul.css("-webkit-backface-visibility", "hidden");
 
             // set required styles
-            container.css({ overflow: "hidden", position: "relative" });
+            container.css({ display: "block", overflow: "hidden", position: "relative" });
             ul.css({ position: "relative", padding: 0, margin: 0 });
 
             // move the ul to startOffset            
