@@ -25,7 +25,7 @@ submodules:
 	@@git submodule foreach "git pull"
 	@@git submodule summary
 
-version:
+version: 
 	@@echo "Setting version number (${VERSION}) and year (${YEAR})"
 	@@sed 's/@VERSION/${VERSION}/' <${SRC_DIR}/${MAIN}.js | sed 's/@YEAR/${YEAR}/' > ${BUILD_DIR}/${MAIN}.tmp
 
@@ -34,7 +34,7 @@ min:
 	echo "Minifying ${PROJECT}"; \
 	${COMPILER} ${BUILD_DIR}/${MAIN}.tmp > ${BUILD_DIR}/${MAIN}.min.js; \
 	else \
-		echo "You must have NodeJS and UglifyJS installed in order to minify ${PROJECT}."; \
+		echo "You must have NodeJS and UglifyJS installed in order to minify ${PROJECT}."; exit 2;\
 	fi
 
 bez:
