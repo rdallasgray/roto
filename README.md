@@ -12,10 +12,10 @@ Roto comes with a minimum of styling, so that you can make it look and behave ho
 
 How do I use it?
 ----------------
-1. Create a div or other block-level element. Give it an id or a classname that you can use to identify it.
-2. Put another element inside it.
-3. Put some more elements inside that one, containing whatever you want to be rotoed (normally images, or images inside links, but whatever you like).
-4. Optionally, add a couple of buttons with classnames 'prev' and 'next' inside the containing element.
+1. Create a div or other block-level element. Give it an id or a classname that you can use to identify it. Let's call this the container.
+2. Put another element inside it; let's call this element the rotoFrame. If you want to be explicit, give this element the class "roto". That's not necessary, but it prevents Roto presuming that the first element inside the container is the rotoFrame, thus allowing you to put other elements into the container first. You can also specify a selector to use instead of ".roto" in the options, if you want.
+3. Put some more elements inside the rotoFrame, containing whatever you want to be rotoed (normally images, or images inside links, but whatever you like).
+4. Optionally, add a couple of buttons with classnames 'prev' and 'next' inside the containing element (you can put them outside too -- see the section below on options);
 5. Call roto on the containing element, e.g. $("#roto-div").roto().
 
 See the demo for an example.

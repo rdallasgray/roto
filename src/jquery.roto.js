@@ -11,6 +11,7 @@
     $.fn.roto = function(options) {
         var defaults = {
                 compat: false,
+                rotoSelector: ".roto",
                 btnPrev: ".prev",
                 btnNext: ".next",
                 direction: "h",
@@ -99,7 +100,8 @@
             var // the element containing the buttons and ul
                 container = $(this),
                 // the element containing the elements to be rotoed, and a cache of its child elements
-                rotoFrame = container.children().first(), rotoKids = rotoFrame.children(),
+                rotoFrame = container.children(rotoSelector).length > 0 ? 
+                    container.children(rotoSelector).first() : container.children().first(), rotoKids = rotoFrame.children(),
                 // the offset measured before the rotoFrame is moved (to prevent problems in IE7)
                 offsetCorrection = 0,
                 // the maximum offset from starting position that the roto can be moved
