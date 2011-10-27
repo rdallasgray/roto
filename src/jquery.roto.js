@@ -369,7 +369,7 @@
                 
                 // goto an element
                 gotoElement = function(el) {
-                    gotoOffset(-1 * el.position()[dimensions.offsetName] + options.startOffset);
+                    gotoOffset(-1 * $(el).position()[dimensions.offsetName] + options.startOffset);
                 },
                 
                 // goto an offset
