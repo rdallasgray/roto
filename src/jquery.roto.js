@@ -262,9 +262,9 @@
                     var func = dir < 0 ? "next" : "prev",
                         curr = $(getNearestRotoKidTo(offset, dir)[0]),
                         next = curr;
-                    do {
+                    while (next[func]().length > 0 && next.position()[dimensions.offsetName] === curr.position()[dimensions.offsetName]){
                         next = next[func]();
-                    } while(next.length > 0 && next.position()[dimensions.offsetName] === curr.position()[dimensions.offsetName]);
+                    }
                     return next;
                 },
                 
