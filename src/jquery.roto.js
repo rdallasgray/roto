@@ -7,7 +7,7 @@
  * Copyright @YEAR Robert Dallas Gray. All rights reserved.
  * Provided under the FreeBSD license: https://github.com/rdallasgray/roto/blob/master/LICENSE.txt
 */
-(function($) {
+(function($, window, document, undefined) {
     $.fn.roto = function(options) {
         var defaults = {
                 compat: false,
@@ -264,7 +264,8 @@
                         next = curr;
                     do {
                         next = next[func]();
-                    } while(next.length > 0 && next.position()[dimensions.offsetName] === curr.position()[dimensions.offsetName])
+                    } while(next.length > 0 && next.position()[dimensions.offsetName] === curr.position()[dimensions.offsetName]);
+                    console.debug(next);
                     return next;
                 },
                 
@@ -627,5 +628,5 @@
             if (offsetCorrection !== 0) remeasure();
         });
     }
-})(jQuery);
+})(jQuery, window, document);
 
