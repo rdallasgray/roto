@@ -265,7 +265,6 @@
                     do {
                         next = next[func]();
                     } while(next.length > 0 && next.position()[dimensions.offsetName] === curr.position()[dimensions.offsetName]);
-                    console.debug(next);
                     return next;
                 },
                 
@@ -425,7 +424,7 @@
                         move = drag;
                     }
                     else {
-                        var diff = (drag > maxOffset) ? drag - maxOffset : drag - minOffset,
+                        var diff = (drag >= maxOffset) ? drag - maxOffset : drag - minOffset,
                             move = drag - diff/options.pull_divisor;
                     }
                     if (state !== states.tracking) {
