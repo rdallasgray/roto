@@ -375,11 +375,15 @@
                 
                 // goto an element
                 gotoElement = function(el) {
-                    gotoOffset(-1 * $(el).position()[dimensions.offsetName] + options.startOffset);
+                    var _el = $(el);
+                    if (!_el.parent() === rotoFrame) return;
+                    gotoOffset(-1 * _el.position()[dimensions.offsetName] + options.startOffset);
                 },
                 
                 // goto an offset
                 gotoOffset = function(offset) {
+                    if (offset > maxOffset) offset = maxOffset;
+                    else if (offset < minOffset) offset = minOffset;
                     doAnimation(rotoFrame, getAnimatedProp(offset), options.shift_duration, "shift", function() {
                         switchButtons();
                         state = states.ready;
