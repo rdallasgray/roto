@@ -347,7 +347,7 @@
                 
                 // respond to a goto event
                 rotoGoto = function(data) {
-                    var type = typeof data;
+                    var type = typeof data, matches;
                     switch(type) {
                         case "number":
                         gotoNumber(data);
@@ -356,7 +356,12 @@
                         gotoElement(data);
                         break;
                         case "string":
-                        gotoNext(data);
+                        if (matches = data.match(/(-?[0-9]+)(px$)/)) {
+                            gotoOffset(matches[1]);
+                        }
+                        else if (matches = data.match(/prev|next/)) {
+                            gotoNext(data);
+                        }
                         break;
                     }
                 },
