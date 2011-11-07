@@ -221,9 +221,10 @@
                 // get the current offset position of the rotoFrame, dependent on whether transforms are supported
                 getCurrentOffset = function() {
                     if (!usingTransitions) return rotoFrame.position()[dimensions.offsetName] - offsetCorrection;
-                    
                     var transformStr = rotoFrame.css(transformProp),
                         matches = transformStr.match(/\-?[0-9]+/g);
+                    
+                    if (matches === null) return 0;
 
                     var val = (dimensions.coOrd === 'X') ? matches[4] : matches[5];
                     return parseInt(val);
@@ -513,29 +514,6 @@
                     switchButtons();
                 };
 
-            // prevent webkit flicker    
-            if (transitionProp === "-webkit-transition") rotoFrame.css("-webkit-backface-visibility", "hidden");
-
-            // set required styles
-            container.css({ display: "block", overflow: "hidden", position: "relative" });
-            rotoFrame.css({ position: "relative", padding: 0, margin: 0 });
-
-            // move the rotoFrame to startOffset            
-            rotoFrame.css(getAnimatedProp(options.startOffset));
-
-            // if prev/next buttons don't seem to be inside the container, look for them outside
-            if (prevButton.length === 0 && options.btnPrev === defaults.btnPrev) {
-                if (container.attr("id")) {
-                    prevButton = $("#"+container.attr("id")+"-prev");
-                    nextButton = $("#"+container.attr("id")+"-next");
-                }
-            }
-
-            // remeasure everything on window resize, in case there are fluid elements involved
-            $(window).resize(function() {
-                boot();
-            });
-
             // bind scroll events
             rotoFrame.bind(scrollEvents.start + ".roto." + containerId, function(e) {
                 state = states.ready;
@@ -606,6 +584,14 @@
                 timer.start();
             });
 
+            // if prev/next buttons don't seem to be inside the container, look for them outside
+            if (prevButton.length === 0 && options.btnPrev === defaults.btnPrev) {
+                if (container.attr("id")) {
+                    prevButton = $("#"+container.attr("id")+"-prev");
+                    nextButton = $("#"+container.attr("id")+"-next");
+                }
+            }
+
             // bind button presses
             if (usingButtons()) {
                 prevButton.click(function() {
@@ -616,15 +602,30 @@
                 });
             }
 
+            // remeasure everything on window resize, in case there are fluid elements involved
+            $(window).resize(function() {
+                boot();
+            });
+
+            // prevent webkit flicker    
+            if (transitionProp === "-webkit-transition") rotoFrame.css("-webkit-backface-visibility", "hidden");
+
+            // set required styles
+            container.css({ display: "block", overflow: "hidden", position: "relative" });
+            rotoFrame.css({ position: "relative", padding: 0, margin: 0 });
+
+            // make IE7 sane
+            offsetCorrection = Math.ceil(getCurrentOffset());
+            if (offsetCorrection !== 0) remeasure();
+
             // let's get started
             container.bind("rotoGoto", function(e, d) { rotoGoto(d); });
             container.bind("rotoShift", function(e, d) { rotoShift(d); });
             container.bind("rotoContentChange", function() { boot(); });
             boot();
 
-            // make IE7 sane
-            offsetCorrection = Math.ceil(getCurrentOffset());
-            if (offsetCorrection !== 0) remeasure();
+            // move the rotoFrame to startOffset            
+            rotoFrame.css(getAnimatedProp(options.startOffset));
         });
     }
 })(jQuery, window, document);
