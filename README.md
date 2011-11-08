@@ -39,13 +39,13 @@ $("#roto").bind("rotoChange", function(event, element) { $(element).css("color",
 
 Roto also listens for the events "rotoGoto", "rotoShift" and "rotoContentChange".
 
-You can pass one of three values as data to the "rotoGoto" event: a number, a jQuery-wrapped element, or a string. 
+You can pass one of three types of values as data to the "rotoGoto" event: a number, a jQuery-wrapped element, or a string. 
 
 The number should be an index into the set of elements contained in the rotoed container (starting from zero);
-The jQuery-wrapped element should be one of the elements in the container (e.g. $("#myelement"));
-The string should be "next" or "prev".
+The jQuery-wrapped element should be one of the elements in the container (e.g. $("#myelement")).
+In each of those cases, roto will zip to the given item.
 
-In each case, roto will zip to the given item -- in the latter case, to the next or previous item in the container.
+The string should be either "next" or "prev", in which case the roto will advance or retreat one item, or an integer followed by "px", in which case the roto will go to the specified offset (e.g. "-200px");
 
 The "rotoShift" event takes one argument as data -- a number, 1 or -1. Passing -1 will advance the roto one container width; passing 1 will retreat one container width.
 
