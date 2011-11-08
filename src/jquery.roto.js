@@ -105,7 +105,7 @@
                 // the offset measured before the rotoFrame is moved (to prevent problems in IE7)
                 offsetCorrection = 0,
                 // the maximum offset from starting position that the roto can be moved
-                maxOffset = options.startOffset,
+                maxOffset = 0,
                 // the minimum offset from starting position that the roto can be moved (to be calculated below)
                 minOffset = 0,
                 // the offset to pointer tracking
@@ -133,8 +133,8 @@
                 buttonsUsed = null;
                 
             // support both jQuery.animate and css transitions
-            var doAnimation = function(element, css, duration, easing, callback) {
-                    var _callback = callback;
+            var doAnimation = function(element, css, easing, callback) {
+                    var _callback = callback, duration = options[easing + "_duration"];
                     // don't add a change notification to the callback if one has already been added --
                     // unless we're not using css transitions, in which case do
                     if (!changeEventPrimed || !usingTransitions) {
@@ -220,11 +220,12 @@
                 
                 // get the current offset position of the rotoFrame, dependent on whether transforms are supported
                 getCurrentOffset = function() {
-                    if (!usingTransitions) return rotoFrame.position()[dimensions.offsetName] - offsetCorrection;
+                    var pos = rotoFrame.position()[dimensions.offsetName] - offsetCorrection;
+                    if (!usingTransitions) return pos;
                     var transformStr = rotoFrame.css(transformProp),
                         matches = transformStr.match(/\-?[0-9]+/g);
                     
-                    if (matches === null) return 0;
+                    if (matches === null) return pos;
 
                     var val = (dimensions.coOrd === 'X') ? matches[4] : matches[5];
                     return parseInt(val);
@@ -241,12 +242,10 @@
                         pos = -1 * Math.ceil(_el.position()[dimensions.offsetName]);
                         li = el;
                         if (dir < 0) {
-                            pos -= options.startOffset;
                             extent = (-1 * pos) + _el[measure](true);
                             bound = -1 * offset;
                         }
                         else {
-                            pos += options.endOffset;
                             extent = _el.prev().length > 0 ? pos + _el.prev()[measure](true) : pos;
                             bound = offset;
                         }
@@ -273,7 +272,7 @@
                 getSnapMove = function(offset, dir, next) {
                     var dir = (dir === 0) ? lastValidDir : dir;
                     return next ? 
-                        -1 * Math.ceil(getNextRotoKidTo(offset, dir).position()[dimensions.offsetName]) 
+                        -1 * Math.ceil(getNextRotoKidTo(offset, dir).position()[dimensions.offsetName])
                         : getNearestRotoKidTo(offset, dir)[1];
                 },
                 
@@ -312,7 +311,7 @@
                         rotoMeasure = Math.round($(last).position()[dimensions.offsetName] + $(last)["outer"+dimensions.measure](true));
                     }
                     containerMeasure = Math.ceil(container[dimensions.measure.toLowerCase()]()),
-                    minOffset = Math.ceil(rotoMeasure - containerMeasure + offsetCorrection + options.endOffset) * -1;
+                    minOffset = Math.ceil(rotoMeasure - containerMeasure + offsetCorrection) * -1;
                     if (options.snap) {
                         var offset = getSnapMove(minOffset, -1, false);
                         // check if the offset we got is less than the non-snap minOffset; if so, use the offset of the next listelement
@@ -332,14 +331,15 @@
                 // enable or disable the previous and next buttons based on roto conditions
                 switchButtons = function() {
                     if (!usingButtons()) return;
+                    var offset = getCurrentOffset();
                     // if the total measure of the rotoKids extends beyond the end of the rotoFrame, enable the next button
-                    if (rotoMeasure > (containerMeasure - getCurrentOffset())) {
+                    if (rotoMeasure + offset > containerMeasure) {
                         nextButton.removeAttr("disabled");
                     }
                     else nextButton.attr("disabled", "disabled");
 
                     // if the rotoKids are offset beyond the start of the rotoFrame, enable the previous button
-                    if (getCurrentOffset() < maxOffset) {
+                    if (offset < maxOffset) {
                         prevButton.removeAttr("disabled");
                     }
                     else prevButton.attr("disabled", "disabled");
@@ -357,7 +357,7 @@
                         break;
                         case "string":
                         if (matches = data.match(/(-?[0-9]+)(px$)/)) {
-                            gotoOffset(matches[1]);
+                            gotoOffset(parseInt(matches[1]));
                         }
                         else if (matches = data.match(/prev|next/)) {
                             gotoNext(data);
@@ -377,14 +377,15 @@
                 gotoElement = function(el) {
                     var _el = $(el);
                     if (!_el.parent() === rotoFrame) return;
-                    gotoOffset(-1 * _el.position()[dimensions.offsetName] + options.startOffset);
+                    gotoOffset(-1 * _el.position()[dimensions.offsetName]);
                 },
                 
                 // goto an offset
-                gotoOffset = function(offset) {
+                gotoOffset = function(offset, animation) {
+                    animation = animation || "shift";
                     if (offset > maxOffset) offset = maxOffset;
                     else if (offset < minOffset) offset = minOffset;
-                    doAnimation(rotoFrame, getAnimatedProp(offset), options.shift_duration, "shift", function() {
+                    doAnimation(rotoFrame, getAnimatedProp(offset), animation, function() {
                         switchButtons();
                         state = states.ready;
                     });
@@ -405,21 +406,13 @@
                     state = states.shifting;
                     lastValidDir = dir;
 
-                    // internal function to move the rotoFrame by the calculated amount
-                    var doShift = function(move) {
-                        doAnimation(rotoFrame, getAnimatedProp(move), options.shift_duration, "shift", function() {
-                            switchButtons();
-                            state = states.ready;
-                        });
-                    };
-
                     if (dir < 0) {
                         // if we're moving forwards, find the element nearest the end of the container
-                        move = Math.max(getSnapMove(getCurrentOffset() - containerMeasure + options.startOffset, dir, false), minOffset);
+                        move = Math.max(getSnapMove(getCurrentOffset() - containerMeasure, dir, false), minOffset);
                     }
                     else {
                         // if we're moving backwards, find the element one container width towards the start of the container
-                        move = Math.min(getSnapMove(getCurrentOffset() + containerMeasure - options.endOffset, dir, false), maxOffset);
+                        move = Math.min(getSnapMove(getCurrentOffset() + containerMeasure, dir, false), maxOffset);
                     }
                     // move the offsetElement to the start of the container
                     gotoOffset(move);
@@ -466,20 +459,15 @@
                         return;
                     }
                     state = states.drifting;
-                    doAnimation(rotoFrame, getAnimatedProp(move), options.drift_duration, "drift", function() {
-                        state = states.ready;
-                        switchButtons();
-                    });
+                    gotoOffset(move, "drift");
                 },
                 
                 // bounce the rotoFrame elastically after it's pulled beyond max or min offsets
                 bounceBack = function(dir) {
+                    console.debug("bounce");
                     var end = (dir < 0) ? minOffset : maxOffset;
                     state = states.bouncing;
-                    doAnimation(rotoFrame, getAnimatedProp(end), options.bounce_duration, "bounce", function() {
-                        state = states.ready;
-                        switchButtons();
-                    });
+                    gotoOffset(end, "bounce");
                 },
                 
                 // timer to calculate speed of pointer movement
@@ -571,7 +559,8 @@
                 // user stopped scrolling
                 $(document).one(scrollEvents.end, function() {
                     timer.stop();
-                    if (getCurrentOffset() > maxOffset || getCurrentOffset() < minOffset) {
+                    var offset = getCurrentOffset();
+                    if (offset > maxOffset || offset < minOffset) {
                         bounceBack(getCurrentOffset() - maxOffset);
                     }
                     else {
@@ -634,7 +623,8 @@
             boot();
 
             // move the rotoFrame to startOffset            
-            rotoFrame.css(getAnimatedProp(options.startOffset));
+//            rotoFrame.css(getAnimatedProp(options.startOffset));
+//            switchButtons();
         });
     }
 })(jQuery, window, document);
