@@ -100,7 +100,9 @@
                 container = $(this),
                 // the element containing the elements to be rotoed, and a cache of its child elements
                 rotoFrame = container.children(options.rotoSelector).length > 0 ? 
-                    container.children(options.rotoSelector).first() : container.children().first(), rotoKids = rotoFrame.children(),
+                    container.children(options.rotoSelector).first() : 
+                    container.children("ul").length > 0 ? container.children("ul").first() : container.children().first(), 
+                rotoKids = rotoFrame.children(),
                 // the offset measured before the rotoFrame is moved (to prevent problems in IE7)
                 offsetCorrection = 0,
                 // the maximum offset from starting position that the roto can be moved
