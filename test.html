@@ -12,7 +12,7 @@
 		<div id="carousel" class="roto">
 			<button class="prev">Previous</button>
 			<button class="next">Next</button>
-			<div class="rotoFrame">
+			<div class="rotoFrame testFrame">
 				<span id="c1"><img src="demo/test-images/roto-test-01.jpg"/></span>
 				<span id="c2"><img src="demo/test-images/roto-test-02.jpg"/></span>
 				<span id="c3"><img src="demo/test-images/roto-test-03.jpg"/></span>
@@ -34,7 +34,7 @@
 
 		<h3>A slideshow:</h3>
 		<div id="slideshow" class="roto">
-			<ul>
+			<ul class="testFrame">
 				<li id="s1" id="s1">Slide 1</li>
 				<li id="s2">Slide 2</li>
 				<li id="s3">Slide 3</li>
@@ -48,7 +48,7 @@
 		
 		<h3>A listbox:</h3>
 		<div id="listbox" class="roto">
-			<div>
+			<div class="testFrame">
 				<span id="l1" id="l1">List item 1</span>
 				<span id="l2">List item 2</span>
 				<span id="l3">List item 3</span>
@@ -76,7 +76,7 @@
 		
 		<h3>A vertical, multiple carousel with snapping:</h3>
 		<div id="vertical-multi" class="roto">
-			<ul>
+			<ul class="testFrame">
 				<li><img src="demo/test-images/roto-test-01.jpg"/></li>
 				<li><img src="demo/test-images/roto-test-02.jpg"/></li>
 				<li><img src="demo/test-images/roto-test-03.jpg"/></li>
@@ -101,7 +101,7 @@
 	</body>
 	<script type="text/javascript">
 	$(window).load(function() {
-		$("#carousel").roto({ startOffset: 350, snap: false });
+		$("#carousel").roto({ snap: false });
 		$("#slideshow").roto();
 		$("#listbox").roto({ direction: "v" });
 		$("#vertical-multi").roto({ direction: "v" });

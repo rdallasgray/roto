@@ -223,11 +223,11 @@
                 getCurrentOffset = function() {
                     if (!usingTransitions) return rotoFrame.position()[dimensions.offsetName] - offsetCorrection;
                     var transformStr = rotoFrame.css(transformProp);
-		    if (transformStr === "none") return 0;
+		            if (transformStr === "none") return 0;
 
                     var matches = transformStr.match(/\-?[0-9]+/g),                    
-		        val = (dimensions.coOrd === 'X') ? matches[4] : matches[5];
-                    return parseInt(val);
+    		        val = (dimensions.coOrd === 'X') ? matches[4] : matches[5];
+                        return parseInt(val);
                 },
                 
                 // find the rotoKid nearest the given offset, and its position
@@ -240,17 +240,17 @@
                         // set pos to the position of the current rotoKid
                         pos = -1 * Math.ceil(_el.position()[dimensions.offsetName]);
                         kid = el;
-			// break the loop early if pos has overshot offset
+			            // break the loop early if pos has overshot offset
                         if (pos * dir >= offset * dir) {
                             return false;
                         }
                         if (dir < 0) {
-			    // if we're searching start-to-end, the extent is the current kid's width or height, plus pos; the bound is the offset
+			                // if we're searching start-to-end, the extent is the current kid's width or height, plus pos; the bound is the offset
                             extent = (-1 * pos) + _el[measure](true);
                             bound = -1 * offset;
                         }
                         else {
-			    // if we're searching end-to-start, the extent is the previous kid's width or height, plus pos; the bound is the offset
+			                // if we're searching end-to-start, the extent is the previous kid's width or height, plus pos; the bound is the offset
                             extent = _el.prev().length > 0 ? pos + _el.prev()[measure](true) : pos;
                             bound = offset;
                         }
@@ -267,7 +267,7 @@
                     var func = dir < 0 ? "next" : "prev",
                         curr = $(getNearestRotoKidTo(offset, dir)[0]),
                         next = curr;
-		    // make sure we don't return a kid at the same offset (which can happen with stacked rotos)
+		            // make sure we don't return a kid at the same offset (which can happen with stacked rotos)
                     while (next[func]().length > 0 && next.position()[dimensions.offsetName] === curr.position()[dimensions.offsetName]){
                         next = next[func]();
                     }
@@ -349,6 +349,12 @@
                         prevButton.removeAttr("disabled");
                     }
                     else prevButton.attr("disabled", "disabled");
+                },
+                
+                // set testing data on the container (used in qUnit tests)
+                rotoSetTestVars: function() {
+                    var testVars = { "options": options };
+                    container.trigger("rotoTestVarsSet", [testVars]);
                 },
                 
                 // respond to a goto event
@@ -521,7 +527,7 @@
                 stopAnimation(rotoFrame);
                 var linkElements = rotoFrame.find("a"),
                 oldLinkEvents = {},
-		coOrdStr = coOrdRef + dimensions.coOrd;
+		        coOrdStr = coOrdRef + dimensions.coOrd;
 
                 if (!isTouchDevice) {
                     e.preventDefault(); // prevent drag behaviour
@@ -624,6 +630,7 @@
             container.bind("rotoGoto", function(e, d) { rotoGoto(d); });
             container.bind("rotoShift", function(e, d) { rotoShift(d); });
             container.bind("rotoContentChange", function() { boot(); });
+            container.bind("rotoTestVars", function() { rotoSetTestVars(); })
             boot();
         });
     }
