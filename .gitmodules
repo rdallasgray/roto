@@ -1,3 +1,6 @@
 [submodule "lib/bez"]
 	path = lib/bez
 	url = git://github.com/rdallasgray/bez.git
+[submodule "lib/qunit"]
+	path = lib/qunit
+	url = git://github.com/jquery/qunit.git
