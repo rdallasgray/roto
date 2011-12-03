@@ -60,10 +60,13 @@ Lots of options. The ones you'll generally want to use are:
 
 - btnPrev: the css selector for the 'Previous' button. Default is '.prev'.
 - btnNext: the css selector for the 'Next' button. Default is '.next'.
+- btnAction: 'step' or 'shift' -- determines whether the buttons advance/retreat one item or one screen at a time. Default is 'shift'.
 - direction: 'h' for horizontal, 'v' for vertical. Default is 'h'.
 - snap: whether to snap to individual elements. Default is true.
+- startOffset: offsets the entire roto the given number of pixels (you may want the 'active' element to be somewhere other than the left side of the container; maybe the centre of the screen)
+- endOffset: creates the given number of pixels in 'dummy' space at the end of the roto. Best used in combination with startOffset.
 
-That's all. Power users have more options and should read the source and experiment.
+There are more options -- power users can read the source and experiment.
 
 The button defaults work when the buttons are INSIDE the overall containing element. If you want to put them outside (which can be useful), you need to give the containing element an id (say, 'roto'), and then id your buttons as '[id]-prev' and '[id]-next' ('roto-prev'/'roto-next'). Otherwise you can specify precisely how to identify them in the options.
 
