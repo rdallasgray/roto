@@ -589,53 +589,67 @@
 /***            STARTING UP THE ROTO                ***/
 
             // bind scroll events
-            rotoFrame.bind(scrollEvents.start + ".roto." + containerId, function(e) {
-                state = states.ready;
+            rotoFrame.bind(scrollEvents.start + ".roto-" + containerId, function(scrollStartEvent) {
+                var stateNow = state;
+                
                 trackingOffset = getCurrentOffset();
                 stopAnimation(rotoFrame);
+                
                 var linkElements = rotoFrame.find("a"),
                 oldLinkEvents = {},
-		        coOrdStr = coOrdRef + dimensions.coOrd;
+		        coOrdStr = coOrdRef + dimensions.coOrd,
+		        eventsDetached = false;
+                
+                if (stateNow !== states.drifting) {
+                    linkElements.unbind("click.roto-trackclick-" + containerId);
+                }
+                
+                state = states.ready;
 
                 if (!isTouchDevice) {
-                    e.preventDefault(); // prevent drag behaviour
+                    scrollStartEvent.preventDefault(); // prevent drag behaviour
                     if (document.ondragstart !== undefined) {
-                        rotoFrame.find("a, img").one("dragstart", function(f) { f.preventDefault(); });
+                        rotoFrame.one("a, img").bind("dragstart.roto-" + containerId, function(dragStartEvent) { 
+                            dragStartEvent.preventDefault(); 
+                        });
                     }
                     if (linkElements.length > 0) {
-                        $(document).one(scrollEvents.move + ".roto." + containerId, function(f) {
-                            // intially prevent link elements responding to clicks at start of rotoFrame tracking
-                            linkElements.one("click.roto." + containerId, function(f) { f.preventDefault(); });
-                            // gather any events attached to linkElements before unbinding
-                            $.each(linkElements.data('events'), function(eventName, events) {
-                                oldLinkEvents[eventName] = [];
-                                $.each(events, function(i, event) {
-                                    oldLinkEvents[eventName].push(event);
+                        $(document).one(scrollEvents.move + ".roto-" + containerId, function(moveStartEvent) {
+                            if (linkElements.data("events") !== undefined) {
+                                // gather any events attached to linkElements before unbinding
+                                $.each(linkElements.data("events"), function(eventName, events) {
+                                    oldLinkEvents[eventName] = [];
+                                    $.each(events, function(i, event) {
+                                        if (event.namespace !== "roto-" + containerId) {
+                                            oldLinkEvents[eventName].push(event);
+                                        }
+                                    });
                                 });
-                            });
-                            // prevent linkElements responding to other events during rotoFrame tracking
-                            linkElements.unbind();
+                                // prevent linkElements responding to other events during rotoFrame tracking
+                                linkElements.unbind();
+                                eventsDetached = true;
+                            }
                             // prevent linkElements responding to clicks during rotoFrame tracking
-                            linkElements.bind("click.roto." + containerId, function(g) {
-                                g.preventDefault();
+                            linkElements.bind("click.roto-trackclick-" + containerId, function(linkTrackClickEvent) {
+                                linkTrackClickEvent.preventDefault();
                             });
                         });
                     }
                 }
-                e = wrapScrollEvent(e);
-                var startCoOrd = e[coOrdStr];
+                scrollStartEvent = wrapScrollEvent(scrollStartEvent);
+                var startCoOrd = scrollStartEvent[coOrdStr];
                 timer.setCurrentCoOrd(startCoOrd);
 
                 // scrolling has started, so begin tracking pointer movement and measuring speed
-                $(document).bind(scrollEvents.move + ".roto." + containerId, function(f) {
-                    f.preventDefault();
-                    f = wrapScrollEvent(f);
-                    timer.setCurrentCoOrd(f[coOrdStr]);
-                    rotoTrack(f[coOrdStr] - startCoOrd);
+                $(document).bind(scrollEvents.move + ".roto-" + containerId, function(trackEvent) {
+                    trackEvent.preventDefault();
+                    trackEvent = wrapScrollEvent(trackEvent);
+                    timer.setCurrentCoOrd(trackEvent[coOrdStr]);
+                    rotoTrack(trackEvent[coOrdStr] - startCoOrd);
                 });
                 
                 // user stopped scrolling
-                $(document).one(scrollEvents.end, function() {
+                $(document).bind(scrollEvents.end + ".roto-" + containerId, function() {
                     timer.stop();
                     var offset = getCurrentOffset();
                     if (offset > maxOffset || offset < minOffset) {
@@ -644,18 +658,18 @@
                     else {
                         rotoDrift();
                     }
-                    $(document).unbind(scrollEvents.move + ".roto." + containerId);
-                    if (!isTouchDevice && linkElements.length > 0) {
-                        window.setTimeout(function() {
+                    $(document).unbind(scrollEvents.move + ".roto-" + containerId);
+                    window.setTimeout(function() {
+                        if (eventsDetached) {
                             // reattach old events to linkElements after a short delay
-                            linkElements.unbind("click.roto." + containerId);
                             $.each(oldLinkEvents, function(eventName, events) {
                                 $.each(events, function(f, event) {
                                     linkElements.bind(event.type + "." + event.namespace, event.data, event.handler);
                                 });
                             });
-                        }, 250);
-                    }
+                        }
+                    }, 250);
+                    $(this).unbind();
                 });
                 timer.start();
             });
