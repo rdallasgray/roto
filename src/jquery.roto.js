@@ -609,7 +609,7 @@
                 if (!isTouchDevice) {
                     scrollStartEvent.preventDefault(); // prevent drag behaviour
                     if (document.ondragstart !== undefined) {
-                        rotoFrame.one("a, img").bind("dragstart.roto-" + containerId, function(dragStartEvent) { 
+                        rotoFrame.find("a, img").one("dragstart.roto-" + containerId, function(dragStartEvent) { 
                             dragStartEvent.preventDefault(); 
                         });
                     }
