@@ -663,11 +663,11 @@
                         if (eventsDetached) {
                             // reattach old events to linkElements after a short delay
                             $.each(oldLinkEvents, function(eventName, events) {
-				var eventStr = event.type;
-				if (event.namespace !== "") {
-				    eventStr = [eventStr, ".", event.namespace].join("");
-				}
                                 $.each(events, function(f, event) {
+				    var eventStr = event.type;
+				    if (event.namespace !== "") {
+					eventStr = [eventStr, ".", event.namespace].join("");
+				    }
                                     linkElements.bind(eventStr, event.data, event.handler);
                                 });
                             });
