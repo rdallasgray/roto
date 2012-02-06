@@ -602,7 +602,7 @@
 		eventsDetached = false;
                 
                 if (stateNow !== states.drifting) {
-                    linkElements.unbind("click.roto-trackclick-" + containerId);
+		    rotoFrame.undelegate("a, img", "click.roto-trackclick-" + containerId);
                 }
                 
                 state = states.ready;
@@ -633,7 +633,7 @@
                                 eventsDetached = true;
                             }
                             // prevent linkElements responding to clicks during rotoFrame tracking
-                            linkElements.bind("click.roto-trackclick-" + containerId, function(linkTrackClickEvent) {
+			    rotoFrame.delegate("a, img", "click.roto-trackclick-" + containerId, function(linkTrackClickEvent) {
                                 linkTrackClickEvent.preventDefault();
                             });
                         });
