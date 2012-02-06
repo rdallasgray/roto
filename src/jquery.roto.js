@@ -32,6 +32,7 @@
             endOffset: 0,
             snap: true,
 	    snap_buffer: 0.5,
+	    clickables: "a, img",
             setTestVars: false
         },
         options = $.extend(defaults, options || {}),
@@ -602,7 +603,7 @@
 		eventsDetached = false;
                 
                 if (stateNow !== states.drifting) {
-		    rotoFrame.undelegate("a, img", "click.roto-trackclick-" + containerId);
+		    rotoFrame.undelegate(options.clickables, "click.roto-trackclick-" + containerId);
                 }
                 
                 state = states.ready;
@@ -612,7 +613,8 @@
 			scrollStartEvent.preventDefault(); // prevent drag behaviour
 		    }
                     if (document.ondragstart !== undefined) {
-                        rotoFrame.find("a, img").one("dragstart.roto-" + containerId, function(dragStartEvent) { 
+			// need to test this in IE before changing to delegate()
+                        rotoFrame.find(options.clickables).one("dragstart.roto-" + containerId, function(dragStartEvent) { 
                             dragStartEvent.preventDefault(); 
                         });
                     }
@@ -633,7 +635,7 @@
                                 eventsDetached = true;
                             }
                             // prevent linkElements responding to clicks during rotoFrame tracking
-			    rotoFrame.delegate("a, img", "click.roto-trackclick-" + containerId, function(linkTrackClickEvent) {
+			    rotoFrame.delegate(options.clickables, "click.roto-trackclick-" + containerId, function(linkTrackClickEvent) {
                                 linkTrackClickEvent.preventDefault();
                             });
                         });
