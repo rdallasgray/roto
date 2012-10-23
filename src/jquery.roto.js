@@ -56,7 +56,7 @@
         // names of events are dependent on whether device uses touch events
         scrollEvents = isTouchDevice ?
             { start: "touchstart", move: "touchmove", end: "touchend" } :
-        { start: "mousedown", move: "mousemove", end: "mouseup" },
+            { start: "mousedown", move: "mousemove", end: "mouseup" },
 
         // get the correct scroll events for touch and desktop devices
         wrapScrollEvent = function(e) {
