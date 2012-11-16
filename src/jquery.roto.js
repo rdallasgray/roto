@@ -504,12 +504,12 @@
                     var opt = {}, LUT = getTransitionLUT();
                     opt[LUT.durationProp] = "0s";
                     opt[LUT.timingFunctionProp] = "none";
-	                if( requireScrolling )
-	                    rotoFrame.css(opt);
+                    if( requireScrolling )
+                        rotoFrame.css(opt);
                 }
                 state = states.tracking;
                 if( requireScrolling )
-		            rotoFrame.css(getAnimatedProp(move));
+                    rotoFrame.css(getAnimatedProp(move));
             },
             
             // continue rotoFrame movement inertially based on pointer speed
