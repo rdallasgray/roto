@@ -378,13 +378,13 @@
                 var offset = getCurrentOffset();
 
                 // if the total measure of the rotoKids extends beyond the end of the rotoFrame, enable the next button
-                if (offset > minOffset || requireScrolling == false) {
+                if (offset > minOffset && requireScrolling) {
                     nextButton.removeAttr("disabled");
                 }
                 else nextButton.attr("disabled", "disabled");
 
                 // if the rotoKids are offset beyond the start of the rotoFrame, enable the previous button
-                if (offset < maxOffset || requireScrolling == false) {
+                if (offset < maxOffset && requireScrolling) {
                     prevButton.removeAttr("disabled");
                 }
                 else prevButton.attr("disabled", "disabled");
