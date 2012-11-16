@@ -124,6 +124,8 @@
             minOffset = 0,
             // the offset to pointer tracking
             trackingOffset = 0,
+            // whether or not there is a need to scroll (i.e. if the space is large than the content, no need for scrolling)
+            requireScrolling = false,
             // the last non-zero direction of travel measured
             lastValidDir = -1,
             // the inner width or height of the container element
@@ -162,7 +164,7 @@
                     }
                     changeEventPrimed = true;
                 }
-                if (usingTransitions) {
+                if (requireScrolling && usingTransitions) {
                     var LUT = getTransitionLUT();
                     if (LUT.timingFunction[easing] === undefined) {
                         LUT.timingFunction[easing] = ["cubic-bezier(", options[easing + "_bezier"].join(","), ")"].join("");
@@ -184,7 +186,7 @@
                     //finally, set the new css properties to initiate the transition
                     element.css(css);
                 }
-                else {
+                else if (requireScrolling) {
                     // we're not using transitions -- use jQuery.animate instead
                     element.animate(css, duration, $.bez(options[easing + "_bezier"]), _callback);
                 }
@@ -356,6 +358,9 @@
                     // check if the offset we got is less than the non-snap minOffset; if so, use the offset of the next rotoKid
                     minOffset = offset > minOffset ? getSnapMove(minOffset, -1, true) : offset;
                 }
+
+                // check if we even need to scroll
+                requireScrolling = minOffset < maxOffset;
             },
             
             // check if prev & next buttons are being used
@@ -373,13 +378,13 @@
                 var offset = getCurrentOffset();
 
                 // if the total measure of the rotoKids extends beyond the end of the rotoFrame, enable the next button
-                if (offset > minOffset) {
+                if (offset > minOffset || requireScrolling == false) {
                     nextButton.removeAttr("disabled");
                 }
                 else nextButton.attr("disabled", "disabled");
 
                 // if the rotoKids are offset beyond the start of the rotoFrame, enable the previous button
-                if (offset < maxOffset) {
+                if (offset < maxOffset || requireScrolling == false) {
                     prevButton.removeAttr("disabled");
                 }
                 else prevButton.attr("disabled", "disabled");
@@ -499,10 +504,12 @@
                     var opt = {}, LUT = getTransitionLUT();
                     opt[LUT.durationProp] = "0s";
                     opt[LUT.timingFunctionProp] = "none";
-                    rotoFrame.css(opt);
+	                if( requireScrolling )
+	                    rotoFrame.css(opt);
                 }
                 state = states.tracking;
-                rotoFrame.css(getAnimatedProp(move));
+                if( requireScrolling )
+		            rotoFrame.css(getAnimatedProp(move));
             },
             
             // continue rotoFrame movement inertially based on pointer speed
@@ -578,6 +585,7 @@
             boot = function() {
                 remeasure();
                 switchButtons();
+                if (requireScrolling == false) rotoFrame.css(getAnimatedProp(0));
                 if (options.setTestVars) setTestVars();
             },
             
