@@ -585,7 +585,7 @@
             boot = function() {
                 remeasure();
                 switchButtons();
-                if (requireScrolling == false) rotoFrame.css(getAnimatedProp(0));
+                if (requireScrolling == false) rotoFrame.css(getAnimatedProp(0));   // Reset to default position if scrolling is off
                 if (options.setTestVars) setTestVars();
             },
             
