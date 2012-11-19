@@ -346,8 +346,7 @@
                 }
                 containerMeasure = Math.round(container[dimensions.measure.toLowerCase()]()),
                 minOffset = -1 * Math.round(
-                    rotoMeasure 
-                        - containerMeasure 
+                    Math.max(0, rotoMeasure - containerMeasure)
                         + offsetCorrection 
                         + options.endOffset
                 );
