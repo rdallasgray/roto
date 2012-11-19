@@ -144,7 +144,9 @@
             // cache of the previous and next button elements
             prevButton = container.find(options.btnPrev), nextButton = container.find(options.btnNext),
             // whether we're using the prev and next buttons
-            buttonsUsed = null;
+            buttonsUsed = null,
+            // whether scrolling is currently enabled
+            scrollingEnabled = true;
 
 
 
@@ -354,6 +356,19 @@
                     var offset = getSnapMove(minOffset, -1, false);
                     // check if the offset we got is less than the non-snap minOffset; if so, use the offset of the next rotoKid
                     minOffset = offset > minOffset ? getSnapMove(minOffset, -1, true) : offset;
+                }
+                setScrollingEnabled(minOffset !== maxOffset);
+            },
+
+            // set whether scrolling is enabled; if not, return to maxOffset and prevent drag events.
+
+            setScrollingEnabled = function(enabled) {
+                if (!enabled) {
+                    gotoOffset(maxOffset);
+                    scrollingEnabled = false;
+                }
+                else {
+                    scrollingEnabled = true;
                 }
             },
             
@@ -645,6 +660,7 @@
 
                 // scrolling has started, so begin tracking pointer movement and measuring speed
                 $(document).bind(scrollEvents.move + ".roto-" + containerId, function(trackEvent) {
+                    if (!scrollingEnabled) return;
                     trackEvent.preventDefault();
                     trackEvent = wrapScrollEvent(trackEvent);
                     timer.setCurrentCoOrd(trackEvent[coOrdStr]);
