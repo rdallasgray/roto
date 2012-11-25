@@ -32,7 +32,7 @@
             endOffset: 0,
             snap: true,
             clickables: "a, img",
-            setTestVars: false
+            auto_disable: true
         },
         options = $.extend(defaults, options || {}),
         
@@ -357,19 +357,15 @@
                     // check if the offset we got is less than the non-snap minOffset; if so, use the offset of the next rotoKid
                     minOffset = offset > minOffset ? getSnapMove(minOffset, -1, true) : offset;
                 }
-                setScrollingEnabled(minOffset !== maxOffset);
+                if (options.auto_disable) setScrollingEnabled(minOffset !== maxOffset);
             },
 
             // set whether scrolling is enabled; if not, return to maxOffset and prevent drag events.
-
             setScrollingEnabled = function(enabled) {
                 if (!enabled) {
                     gotoOffset(maxOffset);
-                    scrollingEnabled = false;
                 }
-                else {
-                    scrollingEnabled = true;
-                }
+                scrollingEnabled = !!enabled;
             },
             
             // check if prev & next buttons are being used
@@ -593,10 +589,6 @@
                 remeasure();
                 switchButtons();
                 if (options.setTestVars) setTestVars();
-            },
-            
-            setTestVars = function() {
-                container.data({ "options": options, "nextButton": nextButton, "prevButton": prevButton });
             };
             
 
@@ -731,6 +723,8 @@
             container.bind("rotoGoto", function(e, d) { rotoGoto(d); });
             container.bind("rotoShift", function(e, d) { rotoShift(d); });
             container.bind("rotoContentChange", function() { boot(); });
+            container.bind("rotoDisable", function() { setScrollingEnabled(false); });
+            container.bind("rotoEnable", function() { setScrollingEnabled(true); });
             boot();
             
             // move to startOffset

@@ -16,7 +16,7 @@ How do I use it?
 2. Put another element inside it; let's call this element the rotoFrame. If you want to be explicit, give this element the class "rotoFrame". That's not necessary, but it prevents Roto presuming that the first element inside the container is the rotoFrame, thus allowing you to put other elements into the container first. You can also specify a selector to use instead of ".rotoFrame" in the options, if you want.
 3. Put some more elements inside the rotoFrame, containing whatever you want to be rotoed (normally images, or images inside links, but whatever you like).
 4. Optionally, add a couple of buttons with classnames 'prev' and 'next' inside the containing element (you can put them outside too -- see the section below on options);
-5. Call roto on the containing element, e.g. $("#roto-div").roto().
+5. Call roto on the containing element, e.g. `$("#roto-div").roto()`.
 
 See the demo for an example.
 
@@ -30,28 +30,32 @@ What else do I need to know?
 ----------------------------
 Roto works best if you call it using $(window).load() rather than $(document).ready(). This is because Webkit-based browsers don't know the dimensions of images at $(document).ready() time, and Roto relies on those dimensions. This can mean you see a 'Flash of Unstyled Content' as the script hasn't applied styles to the rotoed elements before the page begins to display, so you may want to style your rotoed elements with "visibility: hidden" until the window is loaded. Of course, if you're giving all your images explicit dimensions anyway, you can use $(document).ready().
 
+Roto will also auto-disable a rotoed element if its container becomes larger than its contents (so it doesn't actually need to scroll). You can also programmatically enable and disable rotoed elements using events (see below).
+
 
 What about events?
 ------------------
-Roto fires an event called "rotoChange" when the position of the roto content is changed (and on completion of any animations). You can listen for this event on the rotoed container and use it, for example, to change other content in your page when the roto is moved. The event passes the element leftmost or topmost in the roto as data. So you could do something like:
+Roto fires an event called `rotoChange` when the position of the roto content is changed (and on completion of any animations). You can listen for this event on the rotoed container and use it, for example, to change other content in your page when the roto is moved. The event passes the element leftmost or topmost in the roto as data. So you could do something like:
 
-$("#roto").bind("rotoChange", function(event, element) { $(element).css("color", "red") });
+`$("#roto").bind("rotoChange", function(event, element) { $(element).css("color", "red") });`
 
-Roto also listens for the events "rotoGoto", "rotoShift" and "rotoContentChange".
+Roto also listens for the events `rotoGoto`, `rotoShift`,  `rotoContentChange`, `rotoEnable` and `rotoDisable`.
 
 You can pass one of three types of values as data to the "rotoGoto" event: a number, a jQuery-wrapped element, or a string. 
 
 The number should be an index into the set of elements contained in the rotoed container (starting from zero);
-The jQuery-wrapped element should be one of the elements in the container (e.g. $("#myelement")).
+The jQuery-wrapped element should be one of the elements in the container (e.g. `$("#myelement")`).
 In each of those cases, roto will zip to the given item.
 
 The string should be either "next" or "prev", in which case the roto will advance or retreat one item, or an integer followed by "px", in which case the roto will go to the specified offset (e.g. "-200px");
 
-The "rotoShift" event takes one argument as data -- a number, 1 or -1. Passing -1 will advance the roto one container width; passing 1 will retreat one container width.
+The `rotoShift` event takes one argument as data -- a number, 1 or -1. Passing -1 will advance the roto one container width; passing 1 will retreat one container width.
 
 You can use these events to programatically move a roto around based on other events on your page.
 
-If you trigger the "rotoContentChange" event on the container, the roto will remeasure itself -- allowing you to dynamically add or remove content.
+If you trigger the `rotoContentChange` event on the container, the roto will remeasure itself -- allowing you to dynamically add or remove content.
+
+The enable and disable events allow you to programmatically enable or disable the drag-to-scroll functionality; disabling a rotoed element will cause it to return to its maximum offset (normally zero) and ignore any drag events.
 
 
 What options do I have, and what are the defaults?
