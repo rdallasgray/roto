@@ -335,8 +335,9 @@
 				if (options.direction === 'h') {
 					// for each element, add the outer dimension of the element including margin and padding
 					rotoKids.each(function(idx, el) {
-						rotoMeasure += Math.round($(el)["outer"+dimensions.measure](true));
+						rotoMeasure += $(el)["outer"+dimensions.measure](true);
 					});
+					rotoMeasure = Math.ceil( rotoMeasure );
 					// set the dimension of the rotoFrame to what we measured, just to be sure
 					rotoFrame[dimensions.measure.toLowerCase()](rotoMeasure);
 				}
