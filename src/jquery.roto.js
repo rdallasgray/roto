@@ -337,7 +337,6 @@
                     rotoKids.each(function(idx, el) {
                         rotoMeasure += $(el)["outer"+dimensions.measure](true);
                     });
-                    rotoMeasure = Math.ceil( rotoMeasure );
                     // set the dimension of the rotoFrame to what we measured, just to be sure
                     rotoFrame[dimensions.measure.toLowerCase()](rotoMeasure);
                 }
