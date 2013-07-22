@@ -1,14 +1,14 @@
 /*!
  * Roto @VERSION
  * http://github.com/rdallasgray/roto
- * 
+ *
  * A simple, flexible, touch-capable scrolling plugin for jQuery
- * 
+ *
  * Copyright @YEAR Robert Dallas Gray. All rights reserved.
  * Provided under the FreeBSD license: https://github.com/rdallasgray/roto/blob/master/LICENSE.txt
  */
 (function($, window, document, undefined) {
-    
+
     /***        SET UP OVERALL OPTIONS AND DEFAULTS FOR ALL MATCHED ELEMENTS       ***/
 
     $.fn.roto = function(options) {
@@ -35,10 +35,10 @@
             auto_disable: true
         },
         options = $.extend(defaults, options || {}),
-        
+
         // constant to translate milliseconds to seconds
         msToS = 1000,
-        
+
         // could be "client" or "screen"
         coOrdRef = "client",
 
@@ -51,7 +51,7 @@
                 return false;
             }
         }()),
-        
+
         // names of events are dependent on whether device uses touch events
         scrollEvents = isTouchDevice ?
             { start: "touchstart", move: "touchmove", end: "touchend" } :
@@ -64,14 +64,14 @@
             }
             return e;
         },
-        
+
         // names of dimensions are dependent on whether the roto is horizontal or vertical
-        orientations = { 
+        orientations = {
             h: { measure: "Width", offsetName: "left", coOrd: "X", opp: "v" },
             v: { measure: "Height", offsetName: "top", coOrd: "Y", opp: "h" }
         },
         dimensions = orientations[options.direction],
-        
+
         // set up properties and events for css transforms and transitions
         transformProp = null, transitionProp = null, transitionEvent = null, transitionStr = null;
 
@@ -79,8 +79,8 @@
         if (!options.disable_transitions) {
             var body = document.body || document.documentElement,
             transform = {
-                transform: "transform", 
-                MozTransform: "-moz-transform", 
+                transform: "transform",
+                MozTransform: "-moz-transform",
                 WebkitTransform: "-webkit-transform"
             },
             transition = {
@@ -101,20 +101,20 @@
                 }
             }
         }
-        
+
         var usingTransitions = (transitionProp !== null);
 
-        
-        
+
+
         /***        SET UP ENVIRONMENTAL VARIABLES AND METHODS FOR EACH MATCHED ELEMENT       ***/
 
         return this.each(function() {
             var // the element containing the buttons and ul
             container = $(this),
             // the element containing the elements to be rotoed, and a cache of its child elements
-            rotoFrame = container.children(options.rotoSelector).length > 0 ? 
-                container.children(options.rotoSelector).first() : 
-                container.children("ul").length > 0 ? container.children("ul").first() : container.children().first(), 
+            rotoFrame = container.children(options.rotoSelector).length > 0 ?
+                container.children(options.rotoSelector).first() :
+                container.children("ul").length > 0 ? container.children("ul").first() : container.children().first(),
             rotoKids = rotoFrame.children(),
             // the offset measured before the rotoFrame is moved (to prevent problems in IE7)
             offsetCorrection = 0,
@@ -151,7 +151,7 @@
 
 
             /***                LOW-LEVEL ANIMATION FUNCTIONS               ***/
-            
+
             // support both jQuery.animate and css transitions
             var doAnimation = function(element, css, easing, callback) {
                 var _callback = callback, duration = options[easing + "_duration"];
@@ -174,7 +174,7 @@
                     opt[LUT.durationProp] = duration/msToS + "s";
                     opt[LUT.timingFunctionProp] = transitionLUT.timingFunction[easing];
                     element.css(opt);
-                    
+
                     // store the callback as data to use in case animation is stopped
                     element.data("animationCallback", _callback);
                     // and bind it to the transitionEvent, to run if animation completes
@@ -227,7 +227,7 @@
                         var use3d = isTouchDevice ? "3d" : "",
                         translateStr = (use3d === "3d") ? "(Xpx,Ypx,0px)" : "(Xpx,Ypx)",
                         oppCoOrd = orientations[dimensions.opp].coOrd;
-                        animatedProp = ["translate", use3d, 
+                        animatedProp = ["translate", use3d,
                                         translateStr.replace(oppCoOrd, "0")].join("");
                     }
                     opt[transformProp] = animatedProp.replace(dimensions.coOrd, move);
@@ -241,7 +241,7 @@
 
 
             /***                FINDING OFFSETS             ***/
-            
+
             // get the current offset position of the rotoFrame, dependent on whether transforms are supported
             getCurrentOffset = function() {
                 var offset;
@@ -252,13 +252,13 @@
                     var transformStr = rotoFrame.css(transformProp);
                     if (transformStr === "none") return 0;
 
-                    var matches = transformStr.match(/\-?[0-9]+/g),                    
+                    var matches = transformStr.match(/\-?[0-9]+/g),
                     val = (dimensions.coOrd === 'X') ? matches[4] : matches[5];
                     offset = parseInt(val);
                 }
                 return offset - options.startOffset;
             },
-            
+
             // find the rotoKid nearest the given offset, and its position
             getNearestRotoKidTo = function(offset, dir) {
                 var pos = 0, extent, bound,
@@ -274,13 +274,13 @@
                         return false;
                     }
                     if (dir < 0) {
-                        // if we're searching start-to-end, the extent is the current kid's width or height, plus pos; 
+                        // if we're searching start-to-end, the extent is the current kid's width or height, plus pos;
                         // the bound is the offset
                         extent = (-1 * pos) + _el[measure](true);
                         bound = -1 * offset;
                     }
                     else {
-                        // if we're searching end-to-start, the extent is the previous kid's width or height, plus pos; 
+                        // if we're searching end-to-start, the extent is the previous kid's width or height, plus pos;
                         // the bound is the offset
                         extent = _el.prev().length > 0 ? pos + _el.prev()[measure](true) : pos;
                         bound = offset;
@@ -292,38 +292,38 @@
                 });
                 return [kid, pos];
             },
-            
+
             // find the next (by direction) rotoKid to the given offset
             getNextRotoKidTo = function(offset, dir) {
                 var func = dir < 0 ? "next" : "prev",
                 curr = $(getNearestRotoKidTo(offset, dir)[0]),
                 next = curr;
                 // make sure we don't return a kid at the same offset (which can happen with stacked rotos)
-                while (next[func]().length > 0 
+                while (next[func]().length > 0
                        && next.position()[dimensions.offsetName] === curr.position()[dimensions.offsetName]) {
                     next = next[func]();
                 }
                 return next;
             },
-            
+
             // get the position of the rotoKid nearest the given offset
             getSnapMove = function(offset, dir, next) {
                 var dir = (dir === 0) ? lastValidDir : dir
-                return next ? 
+                return next ?
                     -1 * Math.round(getNextRotoKidTo(offset, dir).position()[dimensions.offsetName])
                     : getNearestRotoKidTo(offset, dir)[1];
             },
-            
+
             // is the roto already snapped to a rotoKid?
             isSnapped = function() {
                 var offset = getCurrentOffset();
                 return offset === getSnapMove(offset, lastValidDir, false);
             },
-            
-            
-            
+
+
+
             /***                CHECKING MEASUREMENTS AND OFFSETS               ***/
-            
+
             // remeasure the container and derive the minimum offset allowed
             // the minimum offset is the total measure of the rotoKids - the measure of the rotoFrame
             remeasure = function() {
@@ -335,7 +335,7 @@
                 if (options.direction === 'h') {
                     // for each element, add the outer dimension of the element including margin and padding
                     rotoKids.each(function(idx, el) {
-                        rotoMeasure += Math.round($(el)["outer"+dimensions.measure](true));
+                        rotoMeasure += $(el)["outer"+dimensions.measure](true);
                     });
                     // set the dimension of the rotoFrame to what we measured, just to be sure
                     rotoFrame[dimensions.measure.toLowerCase()](rotoMeasure);
@@ -349,7 +349,7 @@
                 containerMeasure = Math.round(container[dimensions.measure.toLowerCase()]()),
                 minOffset = -1 * Math.round(
                     Math.max(0, rotoMeasure - containerMeasure)
-                        + offsetCorrection 
+                        + offsetCorrection
                         + options.endOffset
                 );
                 if (options.snap) {
@@ -367,7 +367,7 @@
                 }
                 scrollingEnabled = !!enabled;
             },
-            
+
             // check if prev & next buttons are being used
             usingButtons = function() {
                 if (buttonsUsed === null) {
@@ -376,7 +376,7 @@
                 }
                 return buttonsUsed;
             },
-            
+
             // enable or disable the previous and next buttons based on roto conditions
             switchButtons = function() {
                 if (!usingButtons()) return;
@@ -394,17 +394,17 @@
                 }
                 else prevButton.attr("disabled", "disabled");
             },
-            
-            
-            
+
+
+
             /***            TRIGGERING AND RESPONDING TO EVENTS                ***/
-            
+
             // trigger event on completion of move
             notifyChanged = function() {
                 container.trigger("rotoChange", [getNearestRotoKidTo(getCurrentOffset(), 1)[0]]);
                 changeEventPrimed = false;
             },
-            
+
             // respond to a goto event
             rotoGoto = function(data) {
                 var type = typeof data, matches;
@@ -425,21 +425,21 @@
                     break;
                 }
             },
-            
+
             // goto a numbered element
             gotoNumber = function(num) {
                 if (num < 0 || num >= rotoKids.length) return;
                 var el = $(rotoKids.get(num));
                 gotoElement(el);
             },
-            
+
             // goto an element
             gotoElement = function(el) {
                 var _el = $(el);
                 if (!_el.parent() === rotoFrame) return;
                 gotoOffset(-1 * _el.position()[dimensions.offsetName]);
             },
-            
+
             // goto prev or next
             gotoNext = function(dirStr) {
                 var dir = (dirStr === "prev") ? 1 : -1;
@@ -457,9 +457,9 @@
                     state = states.ready;
                 });
             },
-            
-            
-            
+
+
+
             /***                MOVING THE ROTOFRAME                ***/
 
             // shift the rotoKids one rotoFrame width in the given direction
@@ -469,30 +469,30 @@
                 var move = 0;
                 state = states.shifting;
                 lastValidDir = dir;
-                
+
                 if (dir < 0) {
                     // if we're moving forwards, find the element nearest the end of the container
                     move = Math.max(
-                        getSnapMove(getCurrentOffset() - (containerMeasure - options.startOffset), dir, false), 
+                        getSnapMove(getCurrentOffset() - (containerMeasure - options.startOffset), dir, false),
                         minOffset
                     );
                 }
                 else {
                     // if we're moving backwards, find the element one container width towards the start of the container
                     move = Math.min(
-                        getSnapMove(getCurrentOffset() + (containerMeasure - options.startOffset), dir, false), 
+                        getSnapMove(getCurrentOffset() + (containerMeasure - options.startOffset), dir, false),
                         maxOffset
                     );
                 }
                 // move the offsetElement to the start of the container
                 gotoOffset(move);
             },
-            
+
             rotoStep = function(dir) {
                 var dirStr = dir < 0 ? "next" : "prev";
                 gotoNext(dirStr);
             },
-            
+
             // track the rotoFrame to movement of the pointer
             rotoTrack = function(pointerMove) {
                 var drag = Math.round(pointerMove + trackingOffset),
@@ -514,15 +514,15 @@
                 state = states.tracking;
                 rotoFrame.css(getAnimatedProp(move));
             },
-            
+
             // continue rotoFrame movement inertially based on pointer speed
             rotoDrift = function() {
                 var speed_dir = timer.getPointerSpeed(),
                 speed = speed_dir[0], dir = speed_dir[1],
                 cOffset = getCurrentOffset(),
-                distance = speed * options.drift_factor * dir, 
+                distance = speed * options.drift_factor * dir,
                 move = distance + cOffset;
-                
+
                 if (move > maxOffset) move = maxOffset;
                 else if (move < minOffset) move = minOffset;
                 else if (options.snap && !isSnapped()) {
@@ -535,26 +535,26 @@
                 state = states.drifting;
                 gotoOffset(move, "drift");
             },
-            
+
             // bounce the rotoFrame elastically after it's pulled beyond max or min offsets
             bounceBack = function(dir) {
                 var end = (dir < 0) ? minOffset : maxOffset;
                 state = states.bouncing;
                 gotoOffset(end, "bounce");
             },
-            
+
             // whether the buttons shift or step the roto
             buttonAction = options.btnAction === "shift" ? rotoShift : rotoStep,
 
-            
+
             /***                STARTUP AND UTILITY FUNCTIONS               ***/
-            
+
             // timer to calculate speed of pointer movement
             timer = (function() {
                 var startCoOrd = 0, currentCoOrd = 0, initialCoOrd = 0,
                 chunker = null,
                 chunk = { startCoOrd: 0, endCoOrd: 0 };
-                
+
                 return {
                     start: function() {
                         initialCoOrd = startCoOrd = currentCoOrd;
@@ -583,14 +583,14 @@
                     }
                 }
             }()),
-            
+
             // boot or reboot the roto
             boot = function() {
                 remeasure();
                 switchButtons();
                 if (options.setTestVars) setTestVars();
             };
-            
+
 
 
             /***            STARTING UP THE ROTO                ***/
@@ -598,19 +598,19 @@
             // bind scroll events
             rotoFrame.bind(scrollEvents.start + ".roto-" + containerId, function(scrollStartEvent) {
                 var stateNow = state;
-                
+
                 trackingOffset = getCurrentOffset();
                 stopAnimation(rotoFrame);
-                
+
                 var linkElements = rotoFrame.find("a"),
                 oldLinkEvents = {},
                 coOrdStr = coOrdRef + dimensions.coOrd,
                 eventsDetached = false;
-                
+
                 if (stateNow !== states.drifting) {
                     rotoFrame.undelegate(options.clickables, "click.roto-trackclick-" + containerId);
                 }
-                
+
                 state = states.ready;
 
                 if (!isTouchDevice) {
@@ -619,8 +619,8 @@
                     }
                     if (document.ondragstart !== undefined) {
                         // need to test this in IE before changing to delegate()
-                        rotoFrame.find(options.clickables).one("dragstart.roto-" + containerId, function(dragStartEvent) { 
-                            dragStartEvent.preventDefault(); 
+                        rotoFrame.find(options.clickables).one("dragstart.roto-" + containerId, function(dragStartEvent) {
+                            dragStartEvent.preventDefault();
                         });
                     }
                     if (linkElements.length > 0) {
@@ -658,7 +658,7 @@
                     timer.setCurrentCoOrd(trackEvent[coOrdStr]);
                     rotoTrack(trackEvent[coOrdStr] - startCoOrd);
                 });
-                
+
                 // user stopped scrolling
                 $(document).bind(scrollEvents.end + ".roto-" + containerId, function() {
                     timer.stop();
@@ -712,7 +712,7 @@
                 boot();
             });
 
-            // prevent webkit flicker    
+            // prevent webkit flicker
             if (transitionProp === "-webkit-transition") rotoFrame.css("-webkit-backface-visibility", "hidden");
 
             // set required styles
@@ -726,7 +726,7 @@
             container.bind("rotoDisable", function() { setScrollingEnabled(false); });
             container.bind("rotoEnable", function() { setScrollingEnabled(true); });
             boot();
-            
+
             // move to startOffset
             if (options.startOffset !== 0) {
                 rotoFrame.css(getAnimatedProp(options.startOffset));
